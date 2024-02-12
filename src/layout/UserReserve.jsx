@@ -84,11 +84,18 @@ export default function UserReserve() {
       if (rs.status === 200) {
         // alert("Create new OK");
         Swal.fire({
-          title: 'Success',
-          text: 'เรียบร้อยจ่าไข่ตึงจัด',
-          icon: 'success',
-          confirmButtonText: 'จั๋งดุ๋ง'
-        })
+          title: "Success",
+          text: `กรุณาบันทึกหน้าจอ เพื่อให้พนักงานตรวจสอบ\n\nวันที่จอง: ${
+            input.dueDate
+          }\nเวลาเริ่มต้น: ${input.startTime}\nเวลาสิ้นสุด: ${
+            input.endTime
+          }\nสนามที่เลือก: ${
+            fields.find((field) => field.id === parseInt(input.selectedField))
+              ?.name
+          }\nราคาต่อชั่วโมง: ${selectedFieldPrice} บาท\nราคารวม: ${calculateTotalCost()} บาท`,
+          icon: "success",
+          confirmButtonText: "เรียบร้อย",
+        });
       } else {
         throw new Error("Failed to create new.");
       }
@@ -110,83 +117,78 @@ export default function UserReserve() {
   }, []);
   return (
     <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
-    <form
-      className="card-body"
-      onSubmit={hdlSubmit}
-    >
-      <label className="form-control w-full max-w-[220px] ">
-        <div className="label">
-          <span className="label-text">Due Date</span>
-        </div>
-        <input
-          type="date"
-          name="dueDate"
-          value={input.dueDate}
-          onChange={hdlChange}
-        />
-      </label>
-      <label className="form-control w-full max-w-[220px] ">
-        <div className="label">
-          <span className="label-text">Start Time</span>
-        </div>
-        <input
-          type="time"
-          name="startTime"
-          value={input.startTime}
-          onChange={hdlChange}
-        />
-      </label>
-      <label className="form-control w-full max-w-[220px] ">
-        <div className="label">
-          <span className="label-text">End Time</span>
-        </div>
-        <input
-          type="time"
-          name="endTime"
-          value={input.endTime}
-          onChange={hdlChange}
-        />
-      </label>
-      <label className="form-control w-full max-w-[220px] ">
-  <div className="label">
-    <span className="label-text">Select Field</span>
-  </div>
-  <select
-    name="selectedField"
-    value={input.selectedField}
-    onChange={hdlChange}
-  >
-    <option value="">Select a field</option>
-    {fields.map((field) => (
-      <option key={field.id} value={field.id} name={field.name}>
-        {field.name}
-      </option>
-    ))}
-  </select>
-  {selectedFieldPrice > 0 && (
-    <p>Price per hour: {selectedFieldPrice}</p>
-  )}
-</label>
-      <label className="form-control w-full max-w-[220px] ">
-        <div className="label">
-          <span className="label-text">Status</span>
-        </div>
-        <input
-          type="text"
-          name="status"
-          value={input.status}
-          onChange={hdlChange}
-        />
-      </label>
-            {calculateTotalCost}
-            <label className="form-control w-full max-w-[220px]">
-        <div className="label">
-          <span className="label-text">Total Cost</span>
-        </div>
-        <p>{calculateTotalCost()}</p>
-      </label>
-      <button className="btn btn-primary">Add new</button>
-    </form>
+      <form className="card-body" onSubmit={hdlSubmit}>
+        <label className="form-control w-full max-w-[220px] ">
+          <div className="label">
+            <span className="label-text">วันที่จอง</span>
+          </div>
+          <input
+            type="date"
+            name="dueDate"
+            value={input.dueDate}
+            onChange={hdlChange}
+          />
+        </label>
+        <label className="form-control w-full max-w-[220px] ">
+          <div className="label">
+            <span className="label-text">เวลาเริ่มต้น</span>
+          </div>
+          <input
+            type="time"
+            name="startTime"
+            value={input.startTime}
+            onChange={hdlChange}
+          />
+        </label>
+        <label className="form-control w-full max-w-[220px] ">
+          <div className="label">
+            <span className="label-text">เวลาสิ้นสุด</span>
+          </div>
+          <input
+            type="time"
+            name="endTime"
+            value={input.endTime}
+            onChange={hdlChange}
+          />
+        </label>
+        <label className="form-control w-full max-w-[220px] ">
+          <div className="label">
+            <span className="label-text">เลือกสนาม</span>
+          </div>
+          <select
+            name="selectedField"
+            value={input.selectedField}
+            onChange={hdlChange}
+          >
+            <option value="">เลือกสนาม</option>
+            {fields.map((field) => (
+              <option key={field.id} value={field.id} name={field.name}>
+                {field.name}
+              </option>
+            ))}
+          </select>
+          {selectedFieldPrice > 0 && <p>ต่อชม. : {selectedFieldPrice}</p>}
+        </label>
+        <label className="form-control w-full max-w-[220px] ">
+          <div className="label">
+            <span className="label-text">Status</span>
+          </div>
+          <input
+            type="text"
+            name="status"
+            value={input.status}
+            onChange={hdlChange}
+          />
+        </label>
+        {calculateTotalCost}
+        <label className="form-control w-full max-w-[220px]">
+          <div className="label">
+            <span className="label-text"> ราคารวม</span>
+          </div>
+          <p>{calculateTotalCost()} บาท</p>
+        </label>
+        <button className="btn btn-primary"> ยืนยัน</button>
+      </form>
     </div>
   );
 }
