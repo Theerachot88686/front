@@ -1,6 +1,8 @@
 import axios from "axios";
 import React from "react";
 import { useState } from "react";
+import Swal from "sweetalert2"; // Import Swal from sweetalert2 library
+
 export default function RegisterForm() {
   const [input, setInput] = useState({
     username: "",
@@ -9,27 +11,31 @@ export default function RegisterForm() {
     email: "",
   });
 
-  const hdlChange = e => {
-    setInput( prv => ( { ...prv, [e.target.name] : e.target.value } ) )
-  }
+  const hdlChange = (e) => {
+    setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
-  const hdlSubmit = async e => {
+  const hdlSubmit = async (e) => {
     try {
-      e.preventDefault()
-      // validation
-      if(input.password !== input.confirmPassword) {
-        return alert('Please check confirm password')
+      e.preventDefault();
+      // Validation
+      if (input.password !== input.confirmPassword) {
+        return alert("Please check confirm password");
       }
-      const rs = await axios.post('http://localhost:8889/auth/register', input)
-      console.log(rs)
-      if(rs.status === 200) {
-        alert('Register Successful')
+      const rs = await axios.post("http://localhost:8889/auth/register", input);
+      console.log(rs);
+      if (rs.status === 200) {
+        // Display success message using SweetAlert
+        Swal.fire({
+          title: "Good job!",
+          text: "Register Successful",
+          icon: "success",
+        });
       }
-    }catch(err) {
-      console.log( err.message)
+    } catch (err) {
+      console.log(err.message);
     }
-
-  }
+  };
 
   return (
     <div className="flex flex-col justify-center min-h-screen ">

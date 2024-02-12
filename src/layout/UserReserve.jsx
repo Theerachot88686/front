@@ -1,15 +1,15 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 export default function UserReserve() {
   const [input, setInput] = useState({
     dueDate: new Date(),
     startTime: "",
     endTime: "",
-    selectedField:"",
-    status: ""
+    selectedField: "",
+    status: "",
   });
 
   const [selectedFieldPrice, setSelectedFieldPrice] = useState(0);
@@ -26,7 +26,6 @@ export default function UserReserve() {
   };
 
   const calculateFieldPrice = (selectedField) => {
-
     const field = fields.find((field) => field.id == selectedField);
     return field ? field.pricePerHour : 0;
   };
@@ -40,10 +39,10 @@ export default function UserReserve() {
     return hours * pricePerHour;
   };
 
-  const changFormatDate = (date,time) =>{
+  const changFormatDate = (date, time) => {
     let startTime = time;
     let dueDate = date;
-    let [hours, minutes] = startTime.split(':');
+    let [hours, minutes] = startTime.split(":");
 
     // Construct a valid time string for parsing
     let validTimeString = `${dueDate}T${hours}:${minutes}:00`;
@@ -52,10 +51,10 @@ export default function UserReserve() {
     let combinedDateTime = dayjs(validTimeString);
 
     // Format the combined date and time as "YYYY-MM-DD HH:mm:ss"
-    let formattedDateTime = combinedDateTime.format('YYYY-MM-DD HH:mm:ss');
+    let formattedDateTime = combinedDateTime.format("YYYY-MM-DD HH:mm:ss");
 
-    return formattedDateTime
-  }
+    return formattedDateTime;
+  };
   const hdlSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -66,11 +65,11 @@ export default function UserReserve() {
         dueDate: dayjs(`${input.dueDate}T${input.startTime}:00.000Z`),
         totalCost: calculateTotalCost(), // เพิ่มการคำนวณค่าใช้จ่ายทั้งหมด
         status: input.status,
-        fieldId: parseInt(input.selectedField)
+        fieldId: parseInt(input.selectedField),
       };
-      
+
       const token = localStorage.getItem("token");
-      
+
       // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
       const rs = await axios.post(
         "http://localhost:8889/booking/bookings",
@@ -79,7 +78,7 @@ export default function UserReserve() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       // ตรวจสอบสถานะการสร้างการจอง
       if (rs.status === 200) {
         // alert("Create new OK");
@@ -107,7 +106,9 @@ export default function UserReserve() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get("http://localhost:8889/field/getfield");
+        const response = await axios.get(
+          "http://localhost:8889/field/getfield"
+        );
         setFields(response.data);
       } catch (error) {
         console.error("Error fetching fields:", error);
@@ -182,11 +183,11 @@ export default function UserReserve() {
         </label>
         {calculateTotalCost}
         <label className="form-control w-full max-w-[220px]">
-  <div className="label">
-    <span className="label-text"> ราคารวม</span>
-  </div>
-  <p>{calculateTotalCost() || 0} บาท</p>
-</label>
+          <div className="label">
+            <span className="label-text"> ราคารวม</span>
+          </div>
+          <p>{calculateTotalCost() || 0} บาท</p>
+        </label>
 
         <button className="btn btn-primary"> ยืนยัน</button>
       </form>

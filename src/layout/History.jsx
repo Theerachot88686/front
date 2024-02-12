@@ -14,8 +14,10 @@ function History() {
     async function fetchUserBookings() {
       try {
         const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId"); // Assuming you have the user's ID stored
+
         const response = await axios.get(
-          "http://localhost:8889/booking/bookings",
+          `http://localhost:8889/booking/bookings?userId=${userId}`, // Include the user's ID in the request
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -72,6 +74,27 @@ function History() {
     }));
   };
 
+  const handleDeleteBooking = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(
+        `http://localhost:8889/booking/bookings/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Remove the deleted booking from the local state
+      setBookings((prevBookings) =>
+        prevBookings.filter((booking) => booking.id !== id)
+      );
+
+      console.log("Booking deleted successfully");
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+    }
+  };
+
   return (
     <div>
       <div className="overflow-x-auto">
@@ -80,9 +103,9 @@ function History() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Start Time</th>
-              <th>End Time</th>
-              <th>Status</th>
+              <th>เวลาเริ่มต้น</th>
+              <th>เวลาสิ้นสุด</th>
+              <th>หมายเหตุ</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -134,13 +157,13 @@ function History() {
                         className="btn btn-outline btn-success m-2"
                         onClick={() => handleSaveEdit(booking.id)}
                       >
-                        Save
+                        บันทึก
                       </button>
                       <button
                         className="btn btn-outline btn-secondary"
                         onClick={handleCancelEdit}
                       >
-                        Cancel
+                        ยกเลิก
                       </button>
                     </>
                   ) : (
@@ -149,13 +172,13 @@ function History() {
                         className="btn btn-outline btn-warning m-2"
                         onClick={() => handleEditBooking(booking.id, booking)}
                       >
-                        Edit
+                        แก้ไข
                       </button>
                       <button
                         className="btn btn-outline btn-danger"
-                        onClick={() => handleDeleteBooking(booking.id)}
+                        onClick={() => handleDeleteBooking(booking.id)} // Call handleDeleteBooking with booking id
                       >
-                        Delete
+                        ยกเลิก
                       </button>
                     </>
                   )}

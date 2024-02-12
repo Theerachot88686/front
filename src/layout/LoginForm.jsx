@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
+import Swal from "sweetalert2";
 
 export default function LoginForm() {
   const { setUser } = useAuth();
@@ -10,7 +11,7 @@ export default function LoginForm() {
   });
 
   const hdlChange = (e) => {
-    setInput((prv) => ({ ...prv, [e.target.name]: e.target.value }));
+    setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const hdlSubmit = async (e) => {
@@ -25,6 +26,20 @@ export default function LoginForm() {
       });
       console.log(rs1.data);
       setUser(rs1.data);
+
+      // Display success message using SweetAlert
+      Swal.fire({
+        title: "Good job!",
+        text: "You are successfully logged in!",
+        icon: "success",
+      });
+      
+      // Delay redirection to the next page by 2 seconds
+      setTimeout(() => {
+        // Redirect to the next page after 2 seconds
+        // You can use window.location or React Router for redirection
+      }, 2000);
+
     } catch (err) {
       console.log(err.message);
     }
