@@ -39,44 +39,48 @@ function UserHome() {
         </div>
       </div>
       <form className="flex justify-center">
-        <div className="card w-96 bg-base-100 shadow-xl m-4">
-          <figure>
-            <img
-              src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
-              alt="Shoes"
-            />
-          </figure>
-          <div className="card-body">
-            <h2 className="card-title">Shoes!</h2>
-            <p>If a dog chews shoes whose shoes does he choose?</p>
+        <div className="flex justify-center">
+          <div className="card w-96 bg-base-100 shadow-xl m-4">
+            <figure>
+              <img
+                src="ball.webp"
+                alt="Shoes"
+                className="w-full h-72 object-cover"
+              />
+            </figure>
+            <div className="card-body">
+              <h2 className="card-title">สนาม มังกร</h2>
+              <p>1500/ชม. 7คน:ในร่ม</p>
+            </div>
           </div>
-        </div>
-        <div className="card w-96 bg-base-100 shadow-xl m-4">
-          <figure>
-            <img
-              src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
-              alt="Shoes"
-            />
-          </figure>
-          <div className="card-body">
-            <h2 className="card-title">Shoes!</h2>
-            <p>If a dog chews shoes whose shoes does he choose?</p>
+          <div className="card w-96 bg-base-100 shadow-xl m-4">
+            <figure>
+              <img
+                src="ball2.jpg"
+                alt="Shoes"
+                className="w-full h-72 object-cover"
+              />
+            </figure>
+            <div className="card-body">
+              <h2 className="card-title">สนาม ทอง</h2>
+              <p>1500/ชม. 7คน:ในร่ม</p>
+            </div>
           </div>
-        </div>
-        <div className="card w-96 bg-base-100 shadow-xl m-4">
-          <figure>
-            <img
-              src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
-              alt="Shoes"
-            />
-          </figure>
-          <div className="card-body">
-            <h2 className="card-title">Shoes!</h2>
-            <p>If a dog chews shoes whose shoes does he choose?</p>
+          <div className="card w-96 bg-base-100 shadow-xl m-4">
+            <figure>
+              <img
+                src="ball3.webp"
+                alt="Shoes"
+                className="w-full h-72 object-cover"
+              />
+            </figure>
+            <div className="card-body">
+              <h2 className="card-title">สนาม อังคาร</h2>
+              <p>1500/ชม. 7คน:ในร่ม</p>
+            </div>
           </div>
         </div>
       </form>
-      
     </div>
   );
 }

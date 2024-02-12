@@ -51,7 +51,7 @@ export default function LoginForm() {
         <div className="text-center lg:text-left">
           <h1 className="text-5xl font-bold">Football Club</h1>
           <p className="py-6">
-            ควายตูน
+          Scott McTominay’s winner at Aston Villa means his goals have now been worth more points than any other player’s in the Premier League this season.
           </p>
         </div>
         <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">

@@ -116,81 +116,92 @@ export default function UserReserve() {
     }
     fetchData();
   }, []);
+
   return (
-    <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
+    <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
       <form className="card-body" onSubmit={hdlSubmit}>
-        <label className="form-control w-full max-w-[220px] ">
-          <div className="label">
+        <div className="form-control">
+          <label className="label">
             <span className="label-text">วันที่จอง</span>
-          </div>
+          </label>
           <input
+            className="input input-bordered"
             type="date"
             name="dueDate"
             value={input.dueDate}
             onChange={hdlChange}
           />
-        </label>
-        <label className="form-control w-full max-w-[220px] ">
-          <div className="label">
+        </div>
+        <div className="form-control">
+          <label className="label">
             <span className="label-text">เวลาเริ่มต้น</span>
-          </div>
+          </label>
           <input
+            className="input input-bordered"
             type="time"
             name="startTime"
             value={input.startTime}
             onChange={hdlChange}
           />
-        </label>
-        <label className="form-control w-full max-w-[220px] ">
-          <div className="label">
+        </div>
+        <div className="form-control">
+          <label className="label">
             <span className="label-text">เวลาสิ้นสุด</span>
-          </div>
+          </label>
           <input
+            className="input input-bordered"
             type="time"
             name="endTime"
             value={input.endTime}
             onChange={hdlChange}
           />
-        </label>
-        <label className="form-control w-full max-w-[220px] ">
-          <div className="label">
+        </div>
+        <div className="form-control">
+          <label className="label">
             <span className="label-text">เลือกสนาม</span>
-          </div>
+          </label>
           <select
+            className="select select-bordered"
             name="selectedField"
             value={input.selectedField}
             onChange={hdlChange}
           >
-            <option value="">เลือกสนาม</option>
+            <option disabled selected>
+              เลือกสนาม
+            </option>
             {fields.map((field) => (
-              <option key={field.id} value={field.id} name={field.name}>
+              <option key={field.id} value={field.id}>
                 {field.name}
               </option>
             ))}
           </select>
-          {selectedFieldPrice > 0 && <p>ต่อชม. : {selectedFieldPrice}</p>}
-        </label>
-        <label className="form-control w-full max-w-[220px] ">
-          <div className="label">
-            <span className="label-text">Status</span>
-          </div>
+          {selectedFieldPrice > 0 && <p className="label-text">ต่อชม. : {selectedFieldPrice}</p>}
+        </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">หมายเหตุ</span>
+          </label>
           <input
+            className="input input-bordered"
             type="text"
             name="status"
             value={input.status}
             onChange={hdlChange}
           />
-        </label>
-        {calculateTotalCost}
-        <label className="form-control w-full max-w-[220px]">
-          <div className="label">
-            <span className="label-text"> ราคารวม</span>
-          </div>
+        </div>
+        <div className="form-control">
+          {calculateTotalCost && (
+            <label className="label">
+              <span className="label-text"> ราคารวม</span>
+            </label>
+          )}
           <p>{calculateTotalCost() || 0} บาท</p>
-        </label>
-
-        <button className="btn btn-primary"> ยืนยัน</button>
+        </div>
+  
+        <button type="submit" className="btn btn-primary w-full">
+          ยืนยัน
+        </button>
       </form>
     </div>
   );
-}
+          }

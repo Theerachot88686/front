@@ -1,6 +1,5 @@
 import axios from "axios";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2"; // Import Swal from sweetalert2 library
 
 export default function RegisterForm() {
@@ -38,67 +37,68 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="flex flex-col justify-center min-h-screen ">
-      <h1 className=" text-3xl font-bold text-center ">ลงทะเบียน</h1>
-      <div className="flex justify-center mt-10">
-        <div>
-          <form onSubmit={hdlSubmit}>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">username</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                name="username"
-                value={input.username}
-                onChange={hdlChange}
-              />
+    <div className="flex justify-center items-center h-screen">
+      <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
+        <h1 className="text-3xl font-bold text-center">ลงทะเบียน</h1>
+        <form onSubmit={hdlSubmit} className="space-y-5 p-5">
+          <div className="form-control">
+            <label htmlFor="username" className="label">
+              <span className="label-text">Username</span>
             </label>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">password</span>
-              </div>
-              <input
-                type="text"
-                className="input input-bordered w-full max-w-xs"
-                name="password"
-                value={input.password}
-                onChange={hdlChange}
-              />
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={input.username}
+              onChange={hdlChange}
+              className="input input-bordered"
+            />
+          </div>
+          <div className="form-control">
+            <label htmlFor="password" className="label">
+              <span className="label-text">Password</span>
             </label>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Confirm Password</span>
-              </div>
-              <input
-                type="password"
-                className="input input-bordered w-full max-w-xs"
-                name="confirmPassword"
-                value={input.confirmPassword}
-                onChange={hdlChange}
-              />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={input.password}
+              onChange={hdlChange}
+              className="input input-bordered"
+            />
+          </div>
+          <div className="form-control">
+            <label htmlFor="confirmPassword" className="label">
+              <span className="label-text">Confirm Password</span>
             </label>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Email</span>
-              </div>
-              <input
-                type="email"
-                className="input input-bordered w-full max-w-xs"
-                name="email"
-                value={input.email}
-                onChange={hdlChange}
-              />
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={input.confirmPassword}
+              onChange={hdlChange}
+              className="input input-bordered"
+            />
+          </div>
+          <div className="form-control">
+            <label htmlFor="email" className="label">
+              <span className="label-text">Email</span>
             </label>
-
-            <div className="flex justify-center items-end py-3 mt-5">
-              <button type="submit" className="btn w-full max-w-xs">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={input.email}
+              onChange={hdlChange}
+              className="input input-bordered"
+            />
+          </div>
+          <div className="flex justify-center">
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

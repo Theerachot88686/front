@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+
 function History() {
   const [bookings, setBookings] = useState([]);
   const [editingBookingId, setEditingBookingId] = useState(null);
@@ -14,14 +15,17 @@ function History() {
     async function fetchUserBookings() {
       try {
         const token = localStorage.getItem("token");
-        const userId = localStorage.getItem("userId"); // Assuming you have the user's ID stored
-
+        const userId = localStorage.getItem("userId");
+  
         const response = await axios.get(
-          `http://localhost:8889/booking/bookings?userId=${userId}`, // Include the user's ID in the request
+          `http://localhost:8889/booking/bookings?userId=${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+  
+        console.log("Response data:", response.data); // แสดงข้อมูลที่ได้รับมาจาก API ใน console
+  
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching user bookings:", error);
@@ -29,7 +33,7 @@ function History() {
     }
     fetchUserBookings();
   }, []);
-
+  
   const handleEditBooking = (id, bookingData) => {
     setEditingBookingId(id);
     setEditedBooking(bookingData);
@@ -103,6 +107,7 @@ function History() {
           <thead>
             <tr>
               <th>ID</th>
+              <th>ชื่อสนาม</th>
               <th>เวลาเริ่มต้น</th>
               <th>เวลาสิ้นสุด</th>
               <th>หมายเหตุ</th>
@@ -114,9 +119,11 @@ function History() {
             {bookings.map((booking, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
+                <td>{booking.Field && booking.Field.name}</td>
                 <td>
                   {editingBookingId === booking.id ? (
                     <input
+                    className="input input-bordered w-full max-w-xs"
                       type="text"
                       name="startTime"
                       value={editedBooking.startTime}
@@ -129,6 +136,7 @@ function History() {
                 <td>
                   {editingBookingId === booking.id ? (
                     <input
+                    className="input input-bordered w-full max-w-xs"
                       type="text"
                       name="endTime"
                       value={editedBooking.endTime}
@@ -141,6 +149,7 @@ function History() {
                 <td>
                   {editingBookingId === booking.id ? (
                     <input
+                    className="input input-bordered w-full max-w-xs"
                       type="text"
                       name="status"
                       value={editedBooking.status}
@@ -176,7 +185,7 @@ function History() {
                       </button>
                       <button
                         className="btn btn-outline btn-danger"
-                        onClick={() => handleDeleteBooking(booking.id)} // Call handleDeleteBooking with booking id
+                        onClick={() => handleDeleteBooking(booking.id)}
                       >
                         ยกเลิก
                       </button>
