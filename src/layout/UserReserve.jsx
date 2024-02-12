@@ -182,11 +182,12 @@ export default function UserReserve() {
         </label>
         {calculateTotalCost}
         <label className="form-control w-full max-w-[220px]">
-          <div className="label">
-            <span className="label-text"> ราคารวม</span>
-          </div>
-          <p>{calculateTotalCost()} บาท</p>
-        </label>
+  <div className="label">
+    <span className="label-text"> ราคารวม</span>
+  </div>
+  <p>{calculateTotalCost() || 0} บาท</p>
+</label>
+
         <button className="btn btn-primary"> ยืนยัน</button>
       </form>
     </div>

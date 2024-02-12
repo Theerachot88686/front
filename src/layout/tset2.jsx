@@ -21,9 +21,6 @@ function UserReserve() {
     fetchData();
 
 
-
-
-    
   }, []);
   const hdlSubmit = async (e) => {
     try {

@@ -6,6 +6,7 @@ import Header from "../layout/Header";
 import UserHome from "../layout/UserHome";
 import Reserve from "../layout/Reserve"
 import UserReserve from "../layout/UserReserve";
+import History from "../layout/History";
 
 const guestRouter = createBrowserRouter([
   {
@@ -37,6 +38,7 @@ const userRouter = createBrowserRouter([
       { path: "/Reserve", element: <Reserve/> },
       { path: "/user-home", element: <UserHome /> },
       { path: "/user-reserve", element: <UserReserve /> },
+      { path: "/history", element: <History/> },
     ],
   },
 ]);

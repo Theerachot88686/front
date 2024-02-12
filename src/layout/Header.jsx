@@ -7,8 +7,9 @@ const guestNav = [
 ]
 
 const userNav = [
-  { to : '/user-home', text: 'Home' },
-  { to : '/reserve', text: 'Reserve' },
+  { to : '/user-home', text: 'หน้าหลัก' },
+  { to : '/history', text: 'ประวัติการจอง' },
+  { to : '/reserve', text: 'จองสนาม' },
 ]
 
 export default function Header() {
@@ -36,7 +37,7 @@ export default function Header() {
           ))}
           { user?.id && (
             <li>
-              <Link to='#' onClick={hdlLogout}>Logout</Link>
+              <Link to='#' onClick={hdlLogout}>ออกจากระบบ</Link>
             </li>
           ) }
         </ul>
