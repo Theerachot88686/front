@@ -198,7 +198,7 @@ export default function UserReserve() {
           <p>{calculateTotalCost() || 0} บาท</p>
         </div>
   
-        <button type="submit" className="btn btn-primary w-full">
+        <button type="submit" className="btn btn-success w-full">
           ยืนยัน
         </button>
       </form>

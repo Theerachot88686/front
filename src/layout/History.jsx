@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-
 function History() {
   const [bookings, setBookings] = useState([]);
   const [editingBookingId, setEditingBookingId] = useState(null);
@@ -16,16 +15,16 @@ function History() {
       try {
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("userId");
-  
+
         const response = await axios.get(
           `http://localhost:8889/booking/bookings?userId=${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-  
+
         console.log("Response data:", response.data); // แสดงข้อมูลที่ได้รับมาจาก API ใน console
-  
+
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching user bookings:", error);
@@ -33,7 +32,7 @@ function History() {
     }
     fetchUserBookings();
   }, []);
-  
+
   const handleEditBooking = (id, bookingData) => {
     setEditingBookingId(id);
     setEditedBooking(bookingData);
@@ -74,19 +73,16 @@ function History() {
     const { name, value } = e.target;
     setEditedBooking((prevEditedBooking) => ({
       ...prevEditedBooking,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleDeleteBooking = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:8889/booking/bookings/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`http://localhost:8889/booking/bookings/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       // Remove the deleted booking from the local state
       setBookings((prevBookings) =>
@@ -107,7 +103,7 @@ function History() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>ชื่อสนาม</th>
+              
               <th>เวลาเริ่มต้น</th>
               <th>เวลาสิ้นสุด</th>
               <th>หมายเหตุ</th>
@@ -119,11 +115,11 @@ function History() {
             {bookings.map((booking, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{booking.Field && booking.Field.name}</td>
+                
                 <td>
                   {editingBookingId === booking.id ? (
                     <input
-                    className="input input-bordered w-full max-w-xs"
+                      className="input input-bordered w-full max-w-xs"
                       type="text"
                       name="startTime"
                       value={editedBooking.startTime}
@@ -136,7 +132,7 @@ function History() {
                 <td>
                   {editingBookingId === booking.id ? (
                     <input
-                    className="input input-bordered w-full max-w-xs"
+                      className="input input-bordered w-full max-w-xs"
                       type="text"
                       name="endTime"
                       value={editedBooking.endTime}
@@ -149,7 +145,7 @@ function History() {
                 <td>
                   {editingBookingId === booking.id ? (
                     <input
-                    className="input input-bordered w-full max-w-xs"
+                      className="input input-bordered w-full max-w-xs"
                       type="text"
                       name="status"
                       value={editedBooking.status}
