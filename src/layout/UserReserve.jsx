@@ -75,10 +75,14 @@ export default function UserReserve() {
         const inputStartTime = dayjs(output.startTime);
         const inputEndTime = dayjs(output.endTime);
   
+        // Check if the fieldId matches and there's a time overlap
         return (
-          (inputStartTime.isAfter(existingStartTime) && inputStartTime.isBefore(existingEndTime)) ||
-          (inputEndTime.isAfter(existingStartTime) && inputEndTime.isBefore(existingEndTime)) ||
-          (inputStartTime.isSame(existingStartTime) && inputEndTime.isSame(existingEndTime))
+          booking.fieldId === output.fieldId &&
+          (
+            (inputStartTime.isAfter(existingStartTime) && inputStartTime.isBefore(existingEndTime)) ||
+            (inputEndTime.isAfter(existingStartTime) && inputEndTime.isBefore(existingEndTime)) ||
+            (inputStartTime.isSame(existingStartTime) && inputEndTime.isSame(existingEndTime))
+          )
         );
       });
   
@@ -88,6 +92,7 @@ export default function UserReserve() {
       return false;
     }
   };
+  
   
   const hdlSubmit = async (e) => {
     try {
