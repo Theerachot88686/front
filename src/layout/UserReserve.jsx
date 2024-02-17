@@ -242,7 +242,7 @@ export default function UserReserve() {
             onChange={hdlChange}
           />
         </div>
-        <div className="form-control">
+        <div className="form-control ">
           {calculateTotalCost && (
             <label className="label">
               <span className="label-text"> ราคารวม</span>

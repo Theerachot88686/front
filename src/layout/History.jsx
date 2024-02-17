@@ -52,39 +52,6 @@ function History() {
     return dayjs(dateTime).format("YYYY-MM-DD HH:mm:ss");
   };
 
-  const handleEditBooking = (id, bookingData) => {
-    setEditingBookingId(id);
-    setEditedBooking(bookingData);
-  };
-
-  
-  const handleSaveEdit = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8889/booking/bookings/${id}`,
-        editedBooking,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      // Update the local state with the edited booking
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking.id === id ? { ...booking, ...editedBooking } : booking
-        )
-      );
-
-      // Reset the editing state
-      setEditingBookingId(null);
-
-      console.log("Booking updated successfully");
-    } catch (error) {
-      console.error("Error updating booking:", error);
-    }
-  };
-
   const handleCancelEdit = () => {
     setEditingBookingId(null);
   };
@@ -151,29 +118,11 @@ function History() {
                 <td>
                   {editingBookingId === booking.id ? (
                     <>
-                      <button
-                        className="btn btn-outline btn-success m-2"
-                        onClick={() => handleSaveEdit(booking.id)}
-                      >
-                        บันทึก
-                      </button>
-                      <button
-                        className="btn btn-outline btn-secondary"
-                        onClick={handleCancelEdit}
-                      >
-                        ยกเลิก
-                      </button>
                     </>
                   ) : (
                     <>
                       <button
-                        className="btn btn-outline btn-warning m-2"
-                        onClick={() => handleEditBooking(booking.id, booking)}
-                      >
-                        แก้ไข
-                      </button>
-                      <button
-                        className="btn btn-outline btn-danger"
+                        className="btn btn-error m-2"
                         onClick={() => handleDeleteBooking(booking.id)}
                       >
                         ยกเลิก

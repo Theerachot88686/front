@@ -33,7 +33,7 @@ export default function LoginForm() {
         text: "You are successfully logged in!",
         icon: "success",
       });
-      
+
       // Delay redirection to the next page by 2 seconds
       setTimeout(() => {
         // Redirect to the next page after 2 seconds
@@ -41,7 +41,12 @@ export default function LoginForm() {
       }, 2000);
 
     } catch (err) {
-      console.log(err.message);
+      // Display error message using SweetAlert if login fails
+      Swal.fire({
+        title: "Error!",
+        text: "Incorrect username or password",
+        icon: "error",
+      });
     }
   };
 
@@ -58,7 +63,7 @@ export default function LoginForm() {
           <form className="card-body" onSubmit={hdlSubmit}>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">username</span>
+                <span className="label-text">ชื่อผู้ใช้</span>
               </label>
               <input
                 type="text"
@@ -72,7 +77,7 @@ export default function LoginForm() {
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Password</span>
+                <span className="label-text">รหัสผ่าน</span>
               </label>
               <input
                 type="password"
@@ -83,15 +88,10 @@ export default function LoginForm() {
                 value={input.password}
                 onChange={hdlChange}
               />
-              <label className="label">
-                <a href="#" className="label-text-alt link link-hover">
-                  Forgot password?
-                </a>
-              </label>
             </div>
             <div className="form-control mt-6">
               <button type="submit" className="btn btn-success w-full">
-                Login
+                เข้าสู่ระบบ
               </button>
             </div>
           </form>

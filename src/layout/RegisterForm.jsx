@@ -43,7 +43,7 @@ export default function RegisterForm() {
         <form onSubmit={hdlSubmit} className="space-y-5 p-5">
           <div className="form-control">
             <label htmlFor="username" className="label">
-              <span className="label-text">Username</span>
+              <span className="label-text">ชื่อผู้ใช้</span>
             </label>
             <input
               type="text"
@@ -56,7 +56,7 @@ export default function RegisterForm() {
           </div>
           <div className="form-control">
             <label htmlFor="password" className="label">
-              <span className="label-text">Password</span>
+              <span className="label-text">รหัสผ่าน</span>
             </label>
             <input
               type="password"
@@ -69,7 +69,7 @@ export default function RegisterForm() {
           </div>
           <div className="form-control">
             <label htmlFor="confirmPassword" className="label">
-              <span className="label-text">Confirm Password</span>
+              <span className="label-text">ยืนยัน รหัสผ่าน</span>
             </label>
             <input
               type="password"
@@ -94,8 +94,8 @@ export default function RegisterForm() {
             />
           </div>
           <div className="flex justify-center">
-            <button type="submit" className="btn btn-primary">
-              Submit
+            <button type="submit" className="btn btn-success w-full">
+              ยืนยัน
             </button>
           </div>
         </form>
