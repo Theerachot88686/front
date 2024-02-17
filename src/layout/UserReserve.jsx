@@ -55,6 +55,40 @@ export default function UserReserve() {
 
     return formattedDateTime;
   };
+
+
+  const checkDuplicateBooking = async (output) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:8889/booking/bookings?dueDate=${output.dueDate}&fieldId=${output.fieldId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const bookings = response.data;
+  
+      // Check if there are any conflicting bookings
+      const isDuplicate = bookings.some((booking) => {
+        const existingStartTime = dayjs(booking.startTime);
+        const existingEndTime = dayjs(booking.endTime);
+        const inputStartTime = dayjs(output.startTime);
+        const inputEndTime = dayjs(output.endTime);
+  
+        return (
+          (inputStartTime.isAfter(existingStartTime) && inputStartTime.isBefore(existingEndTime)) ||
+          (inputEndTime.isAfter(existingStartTime) && inputEndTime.isBefore(existingEndTime)) ||
+          (inputStartTime.isSame(existingStartTime) && inputEndTime.isSame(existingEndTime))
+        );
+      });
+  
+      return isDuplicate;
+    } catch (error) {
+      console.error("Error checking duplicate booking:", error);
+      return false;
+    }
+  };
+  
   const hdlSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -67,9 +101,21 @@ export default function UserReserve() {
         status: input.status,
         fieldId: parseInt(input.selectedField),
       };
-
+  
+      const isDuplicate = await checkDuplicateBooking(output);
+  
+      if (isDuplicate) {
+        Swal.fire({
+          title: "Error",
+          text: "มีการจองในช่วงเวลาดังกล่าวอยู่แล้ว",
+          icon: "error",
+          confirmButtonText: "ตกลง",
+        });
+        return;
+      }
+  
       const token = localStorage.getItem("token");
-
+  
       // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
       const rs = await axios.post(
         "http://localhost:8889/booking/bookings",
@@ -78,7 +124,7 @@ export default function UserReserve() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+  
       // ตรวจสอบสถานะการสร้างการจอง
       if (rs.status === 200) {
         // alert("Create new OK");
@@ -102,6 +148,8 @@ export default function UserReserve() {
       alert(err.message);
     }
   };
+  
+  
 
   useEffect(() => {
     async function fetchData() {
