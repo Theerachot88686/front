@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import dayjs from "dayjs";
+
 
 function History() {
+  const [fields, setFields] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [editingBookingId, setEditingBookingId] = useState(null);
   const [editedBooking, setEditedBooking] = useState({
@@ -33,11 +36,28 @@ function History() {
     fetchUserBookings();
   }, []);
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get("http://localhost:8889/field/getfield");
+        setFields(response.data);
+      } catch (error) {
+        console.error("Error fetching fields:", error);
+      }
+    }
+    fetchData();
+  }, []);
+  
+  const formatDateTime = (dateTime) => {
+    return dayjs(dateTime).format("YYYY-MM-DD HH:mm:ss");
+  };
+
   const handleEditBooking = (id, bookingData) => {
     setEditingBookingId(id);
     setEditedBooking(bookingData);
   };
 
+  
   const handleSaveEdit = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -103,11 +123,11 @@ function History() {
           <thead>
             <tr>
               <th>ID</th>
-              
-              <th>เวลาเริ่มต้น</th>
-              <th>เวลาสิ้นสุด</th>
+              <th>วัน/เวลาเริ่มต้น</th>
+              <th>วัน/เวลาสิ้นสุด</th>
+              <th>สนาม</th>
               <th>หมายเหตุ</th>
-              <th>Actions</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -115,45 +135,18 @@ function History() {
             {bookings.map((booking, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
-                
                 <td>
-                  {editingBookingId === booking.id ? (
-                    <input
-                      className="input input-bordered w-full max-w-xs"
-                      type="text"
-                      name="startTime"
-                      value={editedBooking.startTime}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    booking.startTime
-                  )}
+                {formatDateTime(booking.startTime)}
                 </td>
                 <td>
-                  {editingBookingId === booking.id ? (
-                    <input
-                      className="input input-bordered w-full max-w-xs"
-                      type="text"
-                      name="endTime"
-                      value={editedBooking.endTime}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    booking.endTime
-                  )}
+                {formatDateTime(booking.endTime)}
                 </td>
                 <td>
-                  {editingBookingId === booking.id ? (
-                    <input
-                      className="input input-bordered w-full max-w-xs"
-                      type="text"
-                      name="status"
-                      value={editedBooking.status}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    booking.status
-                  )}
+                  {/* แสดงชื่อสนาม */}
+                  {fields.find((field) => field.id === booking.fieldId)?.name}
+                </td>
+                <td>
+                  {booking.status}
                 </td>
                 <td>
                   {editingBookingId === booking.id ? (

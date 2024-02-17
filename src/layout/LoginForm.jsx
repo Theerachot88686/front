@@ -90,7 +90,7 @@ export default function LoginForm() {
               </label>
             </div>
             <div className="form-control mt-6">
-              <button type="submit" className="btn btn-primary">
+              <button type="submit" className="btn btn-success w-full">
                 Login
               </button>
             </div>

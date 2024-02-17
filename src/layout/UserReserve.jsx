@@ -99,9 +99,9 @@ export default function UserReserve() {
       e.preventDefault();
       // สร้าง object ข้อมูลที่จะส่งไปยังเซิร์ฟเวอร์
       const output = {
-        startTime: dayjs(`${input.dueDate}T${input.startTime}:00.000Z`),
-        endTime: dayjs(`${input.dueDate}T${input.endTime}:00.000Z`),
-        dueDate: dayjs(`${input.dueDate}T${input.startTime}:00.000Z`),
+        startTime: dayjs(`${input.dueDate}T${input.startTime}:`),
+        endTime: dayjs(`${input.dueDate}T${input.endTime}:`),
+        dueDate: dayjs(`${input.dueDate}T${input.startTime}:`),
         totalCost: calculateTotalCost(), // เพิ่มการคำนวณค่าใช้จ่ายทั้งหมด
         status: input.status,
         fieldId: parseInt(input.selectedField),
