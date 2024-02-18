@@ -171,7 +171,9 @@ export default function UserReserve() {
   }, []);
 
   return (
+    <div className="flex justify-center items-center h-screen -mt-20">
     <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
+    <h1 className="text-3xl font-bold text-center">จองสนาม</h1>
       <form className="card-body" onSubmit={hdlSubmit}>
         <div className="form-control">
           <label className="label">
@@ -255,6 +257,7 @@ export default function UserReserve() {
           ยืนยัน
         </button>
       </form>
+    </div>
     </div>
   );
           }

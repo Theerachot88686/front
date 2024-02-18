@@ -5,7 +5,7 @@ function UserHome() {
     <div>
       <div className="carousel w-full">
         <div id="slide1" className="carousel-item relative w-full">
-          <img src="ball.webp" className="w-full h-96 object-cover" />
+          <img src="OT.jpg" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide4" className="btn btn-circle">
               ❮
@@ -16,7 +16,7 @@ function UserHome() {
           </div>
         </div>
         <div id="slide2" className="carousel-item relative w-full">
-          <img src="ball2.jpg" className="w-full h-96 object-cover" />
+          <img src="ball.webp" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide1" className="btn btn-circle">
               ❮
@@ -27,9 +27,20 @@ function UserHome() {
           </div>
         </div>
         <div id="slide3" className="carousel-item relative w-full">
-          <img src="ball3.webp" className="w-full h-96 object-cover" />
+          <img src="ball2.jpg" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide2" className="btn btn-circle">
+              ❮
+            </a>
+            <a href="#slide4" className="btn btn-circle">
+              ❯
+            </a>
+          </div>
+        </div>
+        <div id="slide4" className="carousel-item relative w-full">
+          <img src="ball3.webp" className="w-full h-96 object-cover" />
+          <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+            <a href="#slide3" className="btn btn-circle">
               ❮
             </a>
             <a href="#slide1" className="btn btn-circle">
@@ -38,45 +49,74 @@ function UserHome() {
           </div>
         </div>
       </div>
-      <form className="flex justify-center">
+      <h1 className="card-title mt-10 ms-80">IN CASE YOU MISSED IT</h1>
+      <form className="flex justify-center mt-5 ">
+        
         <div className="flex justify-center">
-          <div className="card w-96 bg-base-100 shadow-xl m-4">
+          
+          <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="ball.webp"
+                src="Gett.webp"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
             </figure>
             <div className="card-body">
-              <h2 className="card-title">สนาม มังกร</h2>
-              <p>1500/ชม. 7คน:ในร่ม</p>
+              <h2 className="card-title">
+                TEN HAG: MORE YOUNGSTERS CAN BREAK THROUGH
+              </h2>
+              <p>
+                Erik ten Hag believes there are more youngsters at Manchester
+                United capable of making the breakthrough into the first team.
+                Kobbie Mainoo and Alejandro Garnacho have earned regular places
+                in the line-up of late, providing telling contributions to the
+                cause as the Reds have made a good start to 2024.
+              </p>
             </div>
           </div>
-          <div className="card w-96 bg-base-100 shadow-xl m-4">
+          <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="ball2.jpg"
+                src="MCTOMINAY.jpg"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
             </figure>
             <div className="card-body">
-              <h2 className="card-title">สนาม ทอง</h2>
-              <p>1500/ชม. 7คน:ในร่ม</p>
+              <h2 className="card-title">
+                TEN HAG: MCTOMINAY IS GIVING THE TEAM A LOT
+              </h2>
+              <p>
+                The output produced by Manchester United midfielder Scott
+                McTominay is something that is certainly being appreciated by
+                his manager, Erik ten Hag. When it comes to scoring goals, the
+                27-year-old is enjoying the most impactful season of his club
+                career so far, netting a personal-best eight times already in
+                2023/24.
+              </p>
             </div>
           </div>
-          <div className="card w-96 bg-base-100 shadow-xl m-4">
+          <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="ball3.webp"
+                src="Getty.webp"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
             </figure>
             <div className="card-body">
-              <h2 className="card-title">สนาม อังคาร</h2>
-              <p>1500/ชม. 7คน:ในร่ม</p>
+              <h2 className="card-title">
+                TEN HAG: WE HAVE TO GIVE THEM TIME TO DEVELOP
+              </h2>
+              <p>
+                Manchester United boss Erik ten Hag believes showing faith in
+                our young players remains integral in adhering to the club's
+                long-lasting DNA principles. Kobbie Mainoo, Rasmus Hojlund and
+                Alejandro Garnacho have continued to shine for the Reds, who
+                have won five of our six outings in all competitions at the
+                start of 2024.
+              </p>
             </div>
           </div>
         </div>
@@ -199,7 +239,7 @@ function UserHome() {
         </li>
       </ul>
       <div className="diff aspect-[16/9]">
-          <img alt="daisy" src="hojlund.webp" />
+        <img alt="daisy" src="hojlund.webp" />
       </div>
       <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded">
         <nav className="grid grid-flow-col gap-4">
