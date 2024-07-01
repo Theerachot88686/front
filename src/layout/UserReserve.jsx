@@ -56,7 +56,6 @@ export default function UserReserve() {
     return formattedDateTime;
   };
 
-
   const checkDuplicateBooking = async (output) => {
     try {
       const token = localStorage.getItem("token");
@@ -67,33 +66,33 @@ export default function UserReserve() {
         }
       );
       const bookings = response.data;
-  
+
       // Check if there are any conflicting bookings
       const isDuplicate = bookings.some((booking) => {
         const existingStartTime = dayjs(booking.startTime);
         const existingEndTime = dayjs(booking.endTime);
         const inputStartTime = dayjs(output.startTime);
         const inputEndTime = dayjs(output.endTime);
-  
+
         // Check if the fieldId matches and there's a time overlap
         return (
           booking.fieldId === output.fieldId &&
-          (
-            (inputStartTime.isAfter(existingStartTime) && inputStartTime.isBefore(existingEndTime)) ||
-            (inputEndTime.isAfter(existingStartTime) && inputEndTime.isBefore(existingEndTime)) ||
-            (inputStartTime.isSame(existingStartTime) && inputEndTime.isSame(existingEndTime))
-          )
+          ((inputStartTime.isAfter(existingStartTime) &&
+            inputStartTime.isBefore(existingEndTime)) ||
+            (inputEndTime.isAfter(existingStartTime) &&
+              inputEndTime.isBefore(existingEndTime)) ||
+            (inputStartTime.isSame(existingStartTime) &&
+              inputEndTime.isSame(existingEndTime)))
         );
       });
-  
+
       return isDuplicate;
     } catch (error) {
       console.error("Error checking duplicate booking:", error);
       return false;
     }
   };
-  
-  
+
   const hdlSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -106,9 +105,9 @@ export default function UserReserve() {
         status: input.status,
         fieldId: parseInt(input.selectedField),
       };
-  
+
       const isDuplicate = await checkDuplicateBooking(output);
-  
+
       if (isDuplicate) {
         Swal.fire({
           title: "Error",
@@ -118,9 +117,9 @@ export default function UserReserve() {
         });
         return;
       }
-  
+
       const token = localStorage.getItem("token");
-  
+
       // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
       const rs = await axios.post(
         "http://localhost:8889/booking/bookings",
@@ -129,7 +128,7 @@ export default function UserReserve() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       // ตรวจสอบสถานะการสร้างการจอง
       if (rs.status === 200) {
         // alert("Create new OK");
@@ -153,8 +152,6 @@ export default function UserReserve() {
       alert(err.message);
     }
   };
-  
-  
 
   useEffect(() => {
     async function fetchData() {
@@ -172,92 +169,94 @@ export default function UserReserve() {
 
   return (
     <div className="flex justify-center items-center h-screen -mt-20">
-    <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
-    <h1 className="text-3xl font-bold text-center">จองสนาม</h1>
-      <form className="card-body" onSubmit={hdlSubmit}>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">วันที่จอง</span>
-          </label>
-          <input
-            className="input input-bordered"
-            type="date"
-            name="dueDate"
-            value={input.dueDate}
-            onChange={hdlChange}
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">เวลาเริ่มต้น</span>
-          </label>
-          <input
-            className="input input-bordered"
-            type="time"
-            name="startTime"
-            value={input.startTime}
-            onChange={hdlChange}
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">เวลาสิ้นสุด</span>
-          </label>
-          <input
-            className="input input-bordered"
-            type="time"
-            name="endTime"
-            value={input.endTime}
-            onChange={hdlChange}
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">เลือกสนาม</span>
-          </label>
-          <select
-            className="select select-bordered"
-            name="selectedField"
-            value={input.selectedField}
-            onChange={hdlChange}
-          >
-            <option disabled selected>
-              เลือกสนาม
-            </option>
-            {fields.map((field) => (
-              <option key={field.id} value={field.id}>
-                {field.name}
-              </option>
-            ))}
-          </select>
-          {selectedFieldPrice > 0 && <p className="label-text">ต่อชม. : {selectedFieldPrice}</p>}
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">หมายเหตุ</span>
-          </label>
-          <input
-            className="input input-bordered"
-            type="text"
-            name="status"
-            value={input.status}
-            onChange={hdlChange}
-          />
-        </div>
-        <div className="form-control ">
-          {calculateTotalCost && (
+      <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
+        <h1 className="text-3xl font-bold text-center">จองสนาม</h1>
+        <form className="card-body" onSubmit={hdlSubmit}>
+          <div className="form-control">
             <label className="label">
-              <span className="label-text"> ราคารวม</span>
+              <span className="label-text">วันที่จอง</span>
             </label>
-          )}
-          <p>{calculateTotalCost() || 0} บาท</p>
-        </div>
-  
-        <button type="submit" className="btn btn-success w-full">
-          ยืนยัน
-        </button>
-      </form>
-    </div>
+            <input
+              className="input input-bordered"
+              type="date"
+              name="dueDate"
+              value={input.dueDate}
+              onChange={hdlChange}
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">เวลาเริ่มต้น</span>
+            </label>
+            <input
+              className="input input-bordered"
+              type="time"
+              name="startTime"
+              value={input.startTime}
+              onChange={hdlChange}
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">เวลาสิ้นสุด</span>
+            </label>
+            <input
+              className="input input-bordered"
+              type="time"
+              name="endTime"
+              value={input.endTime}
+              onChange={hdlChange}
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">เลือกสนาม</span>
+            </label>
+            <select
+              className="select select-bordered"
+              name="selectedField"
+              value={input.selectedField}
+              onChange={hdlChange}
+            >
+              <option disabled selected>
+                เลือกสนาม
+              </option>
+              {fields.map((field) => (
+                <option key={field.id} value={field.id}>
+                  {field.name}
+                </option>
+              ))}
+            </select>
+            {selectedFieldPrice > 0 && (
+              <p className="label-text">ต่อชม. : {selectedFieldPrice}</p>
+            )}
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">หมายเหตุ</span>
+            </label>
+            <input
+              className="input input-bordered"
+              type="text"
+              name="status"
+              value={input.status}
+              onChange={hdlChange}
+            />
+          </div>
+          <div className="form-control ">
+            {calculateTotalCost && (
+              <label className="label">
+                <span className="label-text"> ราคารวม</span>
+              </label>
+            )}
+            <p>{calculateTotalCost() || 0} บาท</p>
+          </div>
+
+          <button type="submit" className="btn btn-success w-full">
+            ยืนยัน
+          </button>
+        </form>
+      </div>
     </div>
   );
-          }
+}

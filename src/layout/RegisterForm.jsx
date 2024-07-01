@@ -37,7 +37,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen -mt-20">
       <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
         <h1 className="text-3xl font-bold text-center">ลงทะเบียน</h1>
         <form onSubmit={hdlSubmit} className="space-y-5 p-5">

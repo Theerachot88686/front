@@ -39,7 +39,6 @@ export default function LoginForm() {
         // Redirect to the next page after 2 seconds
         // You can use window.location or React Router for redirection
       }, 2000);
-
     } catch (err) {
       // Display error message using SweetAlert if login fails
       Swal.fire({
@@ -56,7 +55,11 @@ export default function LoginForm() {
         <div className="text-center lg:text-left">
           <h1 className="text-5xl font-bold">Football Club</h1>
           <p className="py-6">
-          Scott McTominay’s winner at Aston Villa means his goals have now been worth more points than any other player’s in the Premier League this season.
+            Manchester United are in Premier League action again this weekend,
+            facing Luton Town on our first top-flight visit to Kenilworth Road
+            since April 1992. Erik ten Hag’s men are unbeaten in 2024,
+            overcoming a stern test in the shape of Aston Villa last time out
+            thanks to goals from Rasmus Hojlund and Scott McTominay.
           </p>
         </div>
         <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
