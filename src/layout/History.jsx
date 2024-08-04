@@ -20,7 +20,7 @@ function History() {
         const userId = localStorage.getItem("userId");
 
         const response = await axios.get(
-          `http://localhost:8889/booking/bookings?userId=${userId}`,
+          `https://back-1-1ov9.onrender.com/booking/bookings?userId=${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -40,7 +40,7 @@ function History() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          "http://localhost:8889/field/getfield"
+          "https://back-1-1ov9.onrender.com/field/getfield"
         );
         setFields(response.data);
       } catch (error) {
@@ -84,7 +84,7 @@ function History() {
   const handleDeleteBooking = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8889/booking/bookings/${id}`, {
+      await axios.delete(`https://back-1-1ov9.onrender.com/booking/bookings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

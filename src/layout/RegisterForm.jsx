@@ -21,7 +21,7 @@ export default function RegisterForm() {
       if (input.password !== input.confirmPassword) {
         return alert("Please check confirm password");
       }
-      const rs = await axios.post("http://localhost:8889/auth/register", input);
+      const rs = await axios.post("https://back-1-1ov9.onrender.com/auth/register", input);
       console.log(rs);
       if (rs.status === 200) {
         // Display success message using SweetAlert

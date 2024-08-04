@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 
 export default function UserReserve() {
   const [input, setInput] = useState({
-    dueDate: new Date(),
+    dueDate: dayjs().format('YYYY-MM-DD'), // ตั้งค่าเริ่มต้นเป็นวันปัจจุบัน
     startTime: "",
     endTime: "",
     selectedField: "",
@@ -60,7 +60,7 @@ export default function UserReserve() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8889/booking/bookings?dueDate=${output.dueDate}&fieldId=${output.fieldId}`,
+        `https://back-1-1ov9.onrender.com/booking/bookings?dueDate=${output.dueDate}&fieldId=${output.fieldId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -122,7 +122,7 @@ export default function UserReserve() {
 
       // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
       const rs = await axios.post(
-        "http://localhost:8889/booking/bookings",
+        "https://back-1-1ov9.onrender.com/booking/bookings",
         output,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -157,7 +157,7 @@ export default function UserReserve() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          "http://localhost:8889/field/getfield"
+          "https://back-1-1ov9.onrender.com/field/getfield"
         );
         setFields(response.data);
       } catch (error) {
@@ -218,9 +218,7 @@ export default function UserReserve() {
               value={input.selectedField}
               onChange={hdlChange}
             >
-              <option disabled selected>
-                เลือกสนาม
-              </option>
+              <option>เลือกสนาม</option>
               {fields.map((field) => (
                 <option key={field.id} value={field.id}>
                   {field.name}
@@ -231,6 +229,7 @@ export default function UserReserve() {
               <p className="label-text">ต่อชม. : {selectedFieldPrice}</p>
             )}
           </div>
+
           <div className="form-control">
             <label className="label">
               <span className="label-text">หมายเหตุ</span>
@@ -244,11 +243,9 @@ export default function UserReserve() {
             />
           </div>
           <div className="form-control ">
-            {calculateTotalCost && (
-              <label className="label">
-                <span className="label-text"> ราคารวม</span>
-              </label>
-            )}
+            <label className="label">
+              <span className="label-text"> ราคารวม</span>
+            </label>
             <p>{calculateTotalCost() || 0} บาท</p>
           </div>
 

@@ -5,7 +5,7 @@ function UserHome() {
     <div>
       <div className="carousel w-full">
         <div id="slide1" className="carousel-item relative w-full">
-          <img src="OT.jpg" className="w-full h-96 object-cover" />
+          <img src="https://i.postimg.cc/ncMb2tGZ/OT.jpg" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide4" className="btn btn-circle">
               ❮
@@ -16,7 +16,7 @@ function UserHome() {
           </div>
         </div>
         <div id="slide2" className="carousel-item relative w-full">
-          <img src="ball.webp" className="w-full h-96 object-cover" />
+          <img src="https://i.postimg.cc/jqH9sFgP/ball.webp" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide1" className="btn btn-circle">
               ❮
@@ -27,7 +27,7 @@ function UserHome() {
           </div>
         </div>
         <div id="slide3" className="carousel-item relative w-full">
-          <img src="ball2.jpg" className="w-full h-96 object-cover" />
+          <img src="https://i.postimg.cc/0ykFb0Mj/ball2.jpg" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide2" className="btn btn-circle">
               ❮
@@ -38,7 +38,7 @@ function UserHome() {
           </div>
         </div>
         <div id="slide4" className="carousel-item relative w-full">
-          <img src="ball3.webp" className="w-full h-96 object-cover" />
+          <img src="https://i.postimg.cc/ZYjrJPSV/ball3.webp" className="w-full h-96 object-cover" />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide3" className="btn btn-circle">
               ❮
@@ -57,7 +57,7 @@ function UserHome() {
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="Gett.webp"
+                src="https://i.postimg.cc/NjwtjXYP/Gett.webp"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
@@ -78,7 +78,7 @@ function UserHome() {
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="MCTOMINAY.jpg"
+                src="https://i.postimg.cc/7Zs5c4pV/MCTOMINAY.jpg"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
@@ -100,7 +100,7 @@ function UserHome() {
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="Getty.webp"
+                src="https://i.postimg.cc/X7xM4zHX/Getty.webp"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
@@ -239,7 +239,7 @@ function UserHome() {
         </li>
       </ul>
       <div className="diff aspect-[16/9]">
-        <img alt="daisy" src="hojlund.webp" />
+        <img alt="daisy" src="https://i.postimg.cc/rsFJJQSY/hojlund.webp" />
       </div>
       <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded">
         <nav className="grid grid-flow-col gap-4">

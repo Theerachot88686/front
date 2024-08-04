@@ -2,12 +2,12 @@ import {Link, useNavigate} from 'react-router-dom'
 import useAuth from '../hooks/useAuth';
 
 const guestNav = [
-  { to : '/', text: 'เข้าสู่ระบบ' },
+  { to : '/login', text: 'เข้าสู่ระบบ' },
   { to : '/register', text: 'สมัครสมาชิก' },
 ]
 
 const userNav = [
-  { to : '/user-home', text: 'หน้าหลัก' },
+  { to : '/', text: 'หน้าหลัก' },
   { to : '/history', text: 'ประวัติการจอง' },
   { to : '/reserve', text: 'จองสนาม' },
 ]
@@ -26,7 +26,9 @@ export default function Header() {
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">ยินดีต้อนรับ {user?.id ? user.username : ""}</a>
+      <Link to="/" className="btn btn-ghost text-xl">
+  ยินดีต้อนรับ {user?.id ? user.username : ""}
+</Link>
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
@@ -37,7 +39,7 @@ export default function Header() {
           ))}
           { user?.id && (
             <li>
-              <Link to='#' onClick={hdlLogout}>ออกจากระบบ</Link>
+              <Link to='/' onClick={hdlLogout}>ออกจากระบบ</Link>
             </li>
           ) }
         </ul>

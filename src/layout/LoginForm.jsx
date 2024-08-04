@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
 
 export default function LoginForm() {
   const { setUser } = useAuth();
+  const navigate = useNavigate(); // ใช้ useNavigate จาก react-router-dom
   const [input, setInput] = useState({
     username: "",
     password: "",
@@ -18,10 +20,10 @@ export default function LoginForm() {
     try {
       e.preventDefault();
       // validation
-      const rs = await axios.post("http://localhost:8889/auth/login", input);
+      const rs = await axios.post("https://back-1-1ov9.onrender.com/auth/login", input);
       console.log(rs.data.token);
       localStorage.setItem("token", rs.data.token);
-      const rs1 = await axios.get("http://localhost:8889/auth/me", {
+      const rs1 = await axios.get("https://back-1-1ov9.onrender.com/auth/me", {
         headers: { Authorization: `Bearer ${rs.data.token}` },
       });
       console.log(rs1.data);
@@ -30,15 +32,14 @@ export default function LoginForm() {
       // Display success message using SweetAlert
       Swal.fire({
         title: "Good job!",
-        text: "You are successfully logged in!",
-        icon: "success",
+        text: "ยินดีต้อนรับ",
+        icon: "success"
       });
-
       // Delay redirection to the next page by 2 seconds
       setTimeout(() => {
-        // Redirect to the next page after 2 seconds
-        // You can use window.location or React Router for redirection
-      }, 2000);
+        // Redirect to the home page after 2 seconds
+        navigate("/"); // ใช้ navigate เพื่อเปลี่ยนเส้นทาง
+      }, 1000);
     } catch (err) {
       // Display error message using SweetAlert if login fails
       Swal.fire({

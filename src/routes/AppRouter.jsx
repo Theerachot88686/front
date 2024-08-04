@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginForm from "../layout/LoginForm";
 import RegisterForm from "../layout/RegisterForm";
 import useAuth from "../hooks/useAuth";
@@ -10,7 +10,7 @@ import History from "../layout/History";
 
 const guestRoutes = (
   <>
-    <Route path="/" element={<LoginForm />} />
+    <Route path="/login" element={<LoginForm />} />
     <Route path="/register" element={<RegisterForm />} />
   </>
 );
@@ -19,7 +19,6 @@ const userRoutes = (
   <>
     <Route path="/" element={<UserHome />} />
     <Route path="/reserve" element={<Reserve />} />
-    <Route path="/user-home" element={<UserHome />} />
     <Route path="/user-reserve" element={<UserReserve />} />
     <Route path="/history" element={<History />} />
   </>
@@ -31,8 +30,10 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Header />
-      <Outlet />
-      <Routes>{user?.id ? userRoutes : guestRoutes}</Routes>
+      <Routes>
+        <Route path="/" element={<UserHome />} />
+        {user?.id ? userRoutes : guestRoutes}
+      </Routes>
     </BrowserRouter>
   );
 };
