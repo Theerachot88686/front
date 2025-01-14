@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
 
 export default function LoginForm() {
-  const { setUser } = useAuth();
+  const { setUser , run } = useAuth();
   const navigate = useNavigate(); // ใช้ useNavigate จาก react-router-dom
   const [input, setInput] = useState({
     username: "",
@@ -20,15 +20,11 @@ export default function LoginForm() {
     try {
       e.preventDefault();
       // validation
-      const rs = await axios.post("https://back-1-1ov9.onrender.com/auth/login", input);
-      console.log(rs.data.token);
-      localStorage.setItem("token", rs.data.token);
-      const rs1 = await axios.get("https://back-1-1ov9.onrender.com/auth/me", {
-        headers: { Authorization: `Bearer ${rs.data.token}` },
-      });
-      console.log(rs1.data);
-      setUser(rs1.data);
-
+      const rs = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, input);
+      console.log(rs.data);
+      localStorage.setItem("userData", JSON.stringify(rs.data));
+      console.log(rs.data.role);
+      setUser(rs.data.data);
       // Display success message using SweetAlert
       Swal.fire({
         title: "Good job!",
@@ -38,8 +34,16 @@ export default function LoginForm() {
       // Delay redirection to the next page by 2 seconds
       setTimeout(() => {
         // Redirect to the home page after 2 seconds
-        navigate("/"); // ใช้ navigate เพื่อเปลี่ยนเส้นทาง
-      }, 1000);
+        if(rs.data.role === "admin"){
+          run();
+          navigate("/admin/manage");
+          // window.location.reload();
+        }else{
+          run();
+          navigate("/"); // ใช้ navigate เพื่อเปลี่ยนเส้นทาง
+
+        }
+      }, 2000);
     } catch (err) {
       // Display error message using SweetAlert if login fails
       Swal.fire({

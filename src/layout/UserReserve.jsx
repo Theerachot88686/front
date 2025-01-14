@@ -2,18 +2,32 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import 'react-calendar/dist/Calendar.css';
+import Calendar from 'react-calendar';
+import useAuth from "../hooks/useAuth";
+import { useNavigate } from 'react-router-dom'
 
 export default function UserReserve() {
+  const { user } = useAuth();
   const [input, setInput] = useState({
-    dueDate: dayjs().format('YYYY-MM-DD'), // ตั้งค่าเริ่มต้นเป็นวันปัจจุบัน
+    dueDate: dayjs().format('YYYY-MM-DD'),
     startTime: "",
     endTime: "",
     selectedField: "",
     status: "",
   });
+  const navigate = useNavigate(); // ใช้ useNavigate จาก react-router-dom
 
   const [selectedFieldPrice, setSelectedFieldPrice] = useState(0);
   const [fields, setFields] = useState([]);
+  const [existingBookings, setExistingBookings] = useState([]);
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [bookedTimes, setBookedTimes] = useState([]);
+
+  const timeSlots = [
+    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
+    '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+  ];
 
   const hdlChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +36,10 @@ export default function UserReserve() {
     if (name === "selectedField") {
       const price = calculateFieldPrice(value);
       setSelectedFieldPrice(price);
+    }
+
+    if (name === "dueDate") {
+      fetchBookings(value);
     }
   };
 
@@ -34,47 +52,41 @@ export default function UserReserve() {
     const start = new Date(`2000-01-01T${input.startTime}`);
     const end = new Date(`2000-01-01T${input.endTime}`);
     const hours = (end - start) / (1000 * 60 * 60);
-    const pricePerHour = selectedFieldPrice;
-
-    return hours * pricePerHour;
+    return hours * selectedFieldPrice;
   };
 
-  const changFormatDate = (date, time) => {
-    let startTime = time;
-    let dueDate = date;
-    let [hours, minutes] = startTime.split(":");
-
-    // Construct a valid time string for parsing
-    let validTimeString = `${dueDate}T${hours}:${minutes}:00`;
-
-    // Parse the valid time string into a Day.js object
-    let combinedDateTime = dayjs(validTimeString);
-
-    // Format the combined date and time as "YYYY-MM-DD HH:mm:ss"
-    let formattedDateTime = combinedDateTime.format("YYYY-MM-DD HH:mm:ss");
-
-    return formattedDateTime;
+  const fetchBookings = async (date) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/booking/bookings/all?dueDate=${date}`
+      );
+      const filteredBookings = response.data.filter(
+        booking => dayjs(booking.dueDate).format('YYYY-MM-DD') === date
+      );
+      setExistingBookings(filteredBookings);
+      const times = filteredBookings.map(booking => ({
+        startTime: dayjs(booking.startTime).format('HH:mm'),
+        endTime: dayjs(booking.endTime).format('HH:mm'),
+      }));
+      setBookedTimes(times);
+    } catch (error) {
+      console.error("Error fetching existing bookings:", error);
+    }
   };
 
   const checkDuplicateBooking = async (output) => {
     try {
-      const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://back-1-1ov9.onrender.com/booking/bookings?dueDate=${output.dueDate}&fieldId=${output.fieldId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `${import.meta.env.VITE_API_URL}/booking/bookings/${user.id}/id?dueDate=${output.dueDate}&fieldId=${output.fieldId}`
       );
       const bookings = response.data;
 
-      // Check if there are any conflicting bookings
-      const isDuplicate = bookings.some((booking) => {
+      return bookings.some((booking) => {
         const existingStartTime = dayjs(booking.startTime);
         const existingEndTime = dayjs(booking.endTime);
         const inputStartTime = dayjs(output.startTime);
         const inputEndTime = dayjs(output.endTime);
 
-        // Check if the fieldId matches and there's a time overlap
         return (
           booking.fieldId === output.fieldId &&
           ((inputStartTime.isAfter(existingStartTime) &&
@@ -85,8 +97,6 @@ export default function UserReserve() {
               inputEndTime.isSame(existingEndTime)))
         );
       });
-
-      return isDuplicate;
     } catch (error) {
       console.error("Error checking duplicate booking:", error);
       return false;
@@ -96,12 +106,11 @@ export default function UserReserve() {
   const hdlSubmit = async (e) => {
     try {
       e.preventDefault();
-      // สร้าง object ข้อมูลที่จะส่งไปยังเซิร์ฟเวอร์
       const output = {
-        startTime: dayjs(`${input.dueDate}T${input.startTime}:`),
-        endTime: dayjs(`${input.dueDate}T${input.endTime}:`),
-        dueDate: dayjs(`${input.dueDate}T${input.startTime}:`),
-        totalCost: calculateTotalCost(), // เพิ่มการคำนวณค่าใช้จ่ายทั้งหมด
+        startTime: dayjs(`${input.dueDate}T${input.startTime}`),
+        endTime: dayjs(`${input.dueDate}T${input.endTime}`),
+        dueDate: dayjs(`${input.dueDate}T${input.startTime}`),
+        totalCost: calculateTotalCost(),
         status: input.status,
         fieldId: parseInt(input.selectedField),
       };
@@ -118,20 +127,12 @@ export default function UserReserve() {
         return;
       }
 
-      const token = localStorage.getItem("token");
-
-      // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
       const rs = await axios.post(
-        "https://back-1-1ov9.onrender.com/booking/bookings",
+        `${import.meta.env.VITE_API_URL}/booking/bookings/create/${user.id}`,
         output,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
       );
 
-      // ตรวจสอบสถานะการสร้างการจอง
       if (rs.status === 200) {
-        // alert("Create new OK");
         Swal.fire({
           title: "Success",
           text: `กรุณาบันทึกหน้าจอ เพื่อให้พนักงานตรวจสอบ\n\nวันที่จอง: ${
@@ -145,11 +146,19 @@ export default function UserReserve() {
           icon: "success",
           confirmButtonText: "เรียบร้อย",
         });
+        setTimeout(() => {
+        navigate("/history");
+      }, 2000);
       } else {
         throw new Error("Failed to create new.");
       }
     } catch (err) {
-      alert(err.message);
+      Swal.fire({
+        title: "Error",
+        text: err.message,
+        icon: "error",
+        confirmButtonText: "ตกลง",
+      });
     }
   };
 
@@ -157,7 +166,7 @@ export default function UserReserve() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          "https://back-1-1ov9.onrender.com/field/getfield"
+          `${import.meta.env.VITE_API_URL}/field`
         );
         setFields(response.data);
       } catch (error) {
@@ -167,92 +176,148 @@ export default function UserReserve() {
     fetchData();
   }, []);
 
-  return (
-    <div className="flex justify-center items-center h-screen -mt-20">
-      <div className="card w-full max-w-sm shadow-2xl bg-base-100 mx-auto">
-        <h1 className="text-3xl font-bold text-center">จองสนาม</h1>
-        <form className="card-body" onSubmit={hdlSubmit}>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">วันที่จอง</span>
-            </label>
-            <input
-              className="input input-bordered"
-              type="date"
-              name="dueDate"
-              value={input.dueDate}
-              onChange={hdlChange}
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">เวลาเริ่มต้น</span>
-            </label>
-            <input
-              className="input input-bordered"
-              type="time"
-              name="startTime"
-              value={input.startTime}
-              onChange={hdlChange}
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">เวลาสิ้นสุด</span>
-            </label>
-            <input
-              className="input input-bordered"
-              type="time"
-              name="endTime"
-              value={input.endTime}
-              onChange={hdlChange}
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">เลือกสนาม</span>
-            </label>
-            <select
-              className="select select-bordered"
-              name="selectedField"
-              value={input.selectedField}
-              onChange={hdlChange}
+  useEffect(() => {
+    fetchBookings(dayjs(calendarDate).format('YYYY-MM-DD'));
+  }, [calendarDate]);
+
+  const renderTimeSlots = () => {
+    const rows = [];
+    for (let i = 0; i < timeSlots.length; i += 5) {
+      rows.push(timeSlots.slice(i, i + 5));
+    }
+
+    return rows.map((row, rowIndex) => (
+      <div key={rowIndex} className="flex justify-between mb-2">
+        {row.map((slot, index) => {
+          const isBooked = bookedTimes.some(
+            time => slot >= time.startTime && slot < time.endTime
+          );
+
+          return (
+            <div
+              key={index}
+              className={`w-1/5 text-center p-2 rounded ${
+                isBooked ? 'bg-red-200 text-red-700 line-through cursor-not-allowed' : 'bg-green-200 text-green-700 hover:bg-green-300 cursor-pointer'
+              }`}
+              title={isBooked ? "เวลานี้ถูกจองแล้ว" : "ว่าง"}
             >
-              <option>เลือกสนาม</option>
-              {fields.map((field) => (
-                <option key={field.id} value={field.id}>
-                  {field.name}
-                </option>
-              ))}
-            </select>
-            {selectedFieldPrice > 0 && (
-              <p className="label-text">ต่อชม. : {selectedFieldPrice}</p>
-            )}
-          </div>
+              {slot}
+            </div>
+          );
+        })}
+      </div>
+    ));
+  };
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">หมายเหตุ</span>
-            </label>
-            <input
-              className="input input-bordered"
-              type="text"
-              name="status"
-              value={input.status}
-              onChange={hdlChange}
-            />
+  return (
+    <div className="flex flex-col md:flex-row justify-center items-start min-h-screen px-4 py-8 bg-gray-100">
+      {/* ฟอร์มการจอง */}
+      <div className="card w-full max-w-md shadow-lg bg-white p-6 rounded-lg mb-6 md:mb-0 md:mr-6">
+        <h1 className="text-3xl font-bold text-center mb-6">จองสนาม</h1>
+        <form onSubmit={hdlSubmit}>
+          <fieldset className="mb-4">
+            <legend className="text-lg font-semibold mb-2">ข้อมูลการจอง</legend>
+            <div className="mb-4">
+              <label className="block text-gray-700">วันที่จอง</label>
+              <input
+                type="date"
+                name="dueDate"
+                value={input.dueDate}
+                onChange={hdlChange}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                required
+              />
+            </div>
+            <div className="flex space-x-4 mb-4">
+              <div className="w-1/2">
+                <label className="block text-gray-700">เวลาเริ่มต้น</label>
+                <input
+                  type="time"
+                  name="startTime"
+                  value={input.startTime}
+                  onChange={hdlChange}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  required
+                />
+              </div>
+              <div className="w-1/2">
+                <label className="block text-gray-700">เวลาสิ้นสุด</label>
+                <input
+                  type="time"
+                  name="endTime"
+                  value={input.endTime}
+                  onChange={hdlChange}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  required
+                />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">เลือกสนาม</label>
+              <select
+                name="selectedField"
+                value={input.selectedField}
+                onChange={hdlChange}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                required
+              >
+                <option value="">เลือกสนาม</option>
+                {fields.map((field) => (
+                  <option key={field.id} value={field.id}>
+                    {field.name}
+                  </option>
+                ))}
+              </select>
+              {selectedFieldPrice > 0 && (
+                <p className="mt-2 text-sm text-gray-600">ราคาต่อชั่วโมง: {selectedFieldPrice} บาท</p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">หมายเหตุ</label>
+              <input
+                type="text"
+                name="status"
+                value={input.status}
+                onChange={hdlChange}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="กรอกหมายเหตุ (ถ้ามี)"
+              />
+            </div>
+          </fieldset>
+          <div className="mb-4">
+            <label className="block text-gray-700">ราคารวม</label>
+            <p className="text-lg font-semibold">{calculateTotalCost() || 0} บาท</p>
           </div>
-          <div className="form-control ">
-            <label className="label">
-              <span className="label-text"> ราคารวม</span>
-            </label>
-            <p>{calculateTotalCost() || 0} บาท</p>
-          </div>
-
           <button type="submit" className="btn btn-success w-full">
             ยืนยัน
           </button>
         </form>
+      </div>
+
+      {/* ปฏิทินและการจองที่มีอยู่แล้ว */}
+      <div className="card w-full max-w-md shadow-lg bg-white p-6 rounded-lg">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">ตรวจสอบการจอง</h2>
+          <Calendar
+            onChange={(date) => {
+              setCalendarDate(date);
+              fetchBookings(dayjs(date).format('YYYY-MM-DD'));
+            }}
+            value={calendarDate}
+            className="mb-6"
+          />
+          <div>
+            <h3 className="text-xl font-semibold mb-2">
+              การจองในวันที่ {dayjs(calendarDate).format('DD-MM-YYYY')}
+            </h3>
+            <div>
+              <h4 className="text-lg font-medium">เวลาที่ว่าง:</h4>
+              <div className="mt-2">
+                {renderTimeSlots()}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

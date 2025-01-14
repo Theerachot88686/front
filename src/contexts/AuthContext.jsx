@@ -8,32 +8,32 @@ function AuthContextProvider(props) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect( ()=>{
-    const run = async () => {
-      try {
-        setLoading(true)
-        let token = localStorage.getItem('token')
-        if(!token) { return }
-        const rs = await axios.get('https://back-1-1ov9.onrender.com/auth/me', {
-          headers : { Authorization : `Bearer ${token}` }
-        })
-        setUser(rs.data)
-      }catch(err) {
-        console.log(err.message)
-      }finally {
-        setLoading(false)
-      }   
-    }
-    run()
-  }, [])
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('token')
+  const run = async () => {
+    try {
+      setLoading(true)
+      let userData = JSON.parse(localStorage.getItem("userData"));
+      if(!userData) { return }
+      setUser(userData);
+    }catch(err) {
+      console.log(err.message)
+    }finally {
+      setLoading(false)
+    }   
   }
 
+  useEffect( ()=>{
+    run()
+  }, [])
+  
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("userData");
+  };
+
   return (
-    <AuthContext.Provider value={ {user, setUser, loading, logout} }>
+    <AuthContext.Provider value={ {user, setUser, loading, logout,run} }>
       {props.children}
     </AuthContext.Provider>
   )

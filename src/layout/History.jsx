@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import useAuth from "../hooks/useAuth";
 
 function History() {
   const [fields, setFields] = useState([]);
@@ -12,18 +13,14 @@ function History() {
     endTime: "",
     status: "",
   });
+  const { user } = useAuth();
 
   useEffect(() => {
     async function fetchUserBookings() {
       try {
-        const token = localStorage.getItem("token");
-        const userId = localStorage.getItem("userId");
 
         const response = await axios.get(
-          `https://back-1-1ov9.onrender.com/booking/bookings?userId=${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          `${import.meta.env.VITE_API_URL}/booking/bookings/${user.id}/id`
         );
 
         console.log("Response data:", response.data); // แสดงข้อมูลที่ได้รับมาจาก API ใน console
@@ -40,7 +37,7 @@ function History() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          "https://back-1-1ov9.onrender.com/field/getfield"
+          `${import.meta.env.VITE_API_URL}/field`
         );
         setFields(response.data);
       } catch (error) {
@@ -83,10 +80,10 @@ function History() {
 
   const handleDeleteBooking = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`https://back-1-1ov9.onrender.com/booking/bookings/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://back-2-hqew.onrender.com/booking/bookings/${id}`
+      );
+      
 
       // Remove the deleted booking from the local state
       setBookings((prevBookings) =>
@@ -113,6 +110,7 @@ function History() {
       });
     }
   };
+  
 
   return (
     <div>
@@ -121,7 +119,7 @@ function History() {
           {/* head */}
           <thead>
             <tr>
-              <th>ID</th>
+              <th>ลำดับ</th>
               <th>วัน/เวลาเริ่มต้น</th>
               <th>วัน/เวลาสิ้นสุด</th>
               <th>สนาม</th>

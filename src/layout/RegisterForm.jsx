@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import Swal from "sweetalert2"; // Import Swal from sweetalert2 library
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
   const [input, setInput] = useState({
@@ -21,7 +22,7 @@ export default function RegisterForm() {
       if (input.password !== input.confirmPassword) {
         return alert("Please check confirm password");
       }
-      const rs = await axios.post("https://back-1-1ov9.onrender.com/auth/register", input);
+      const rs = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, input);
       console.log(rs);
       if (rs.status === 200) {
         // Display success message using SweetAlert
@@ -30,6 +31,7 @@ export default function RegisterForm() {
           text: "Register Successful",
           icon: "success",
         });
+        navigate("/login")
       }
     } catch (err) {
       console.log(err.message);

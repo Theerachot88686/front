@@ -4,9 +4,12 @@ import RegisterForm from "../layout/RegisterForm";
 import useAuth from "../hooks/useAuth";
 import Header from "../layout/Header";
 import UserHome from "../layout/UserHome";
-import Reserve from "../layout/Reserve";
 import UserReserve from "../layout/UserReserve";
 import History from "../layout/History";
+import Manage from "../layout/Manage";
+import ManageUser from "../layout/ManageUser";
+import Field from "../layout/Field";
+import BookingField from "../layout/BookingField";
 
 const guestRoutes = (
   <>
@@ -18,9 +21,16 @@ const guestRoutes = (
 const userRoutes = (
   <>
     <Route path="/" element={<UserHome />} />
-    <Route path="/reserve" element={<Reserve />} />
-    <Route path="/user-reserve" element={<UserReserve />} />
     <Route path="/history" element={<History />} />
+  </>
+);
+
+const adminRoutes = (
+  <>
+    <Route path="/admin/manage" element={<Manage />} />
+    <Route path="/admin/manageuser" element={<ManageUser />} />
+    <Route path="/admin/manage/bookingfield" element={<BookingField />} />
+    <Route path="/admin/manage/field" element={<Field />} />
   </>
 );
 
@@ -31,8 +41,11 @@ const AppRouter = () => {
     <BrowserRouter>
       <Header />
       <Routes>
+        {/* Public route for user-reserve */}
+        <Route path="/user-reserve" element={<UserReserve />} />
         <Route path="/" element={<UserHome />} />
-        {user?.id ? userRoutes : guestRoutes}
+        {/* Check user role and render the appropriate routes */}
+        {user?.role === "admin" ? adminRoutes : user?.id ? userRoutes : guestRoutes}
       </Routes>
     </BrowserRouter>
   );
