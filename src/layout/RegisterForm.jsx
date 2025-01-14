@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
-import Swal from "sweetalert2"; // Import Swal from sweetalert2 library
-import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // ใช้ SweetAlert สำหรับแสดงข้อความแจ้งเตือน
+import { useNavigate } from "react-router-dom"; // ใช้ useNavigate สำหรับการเปลี่ยนเส้นทาง
 
 export default function RegisterForm() {
   const [input, setInput] = useState({
@@ -11,27 +11,31 @@ export default function RegisterForm() {
     email: "",
   });
 
+  // ฟังก์ชันสำหรับการเปลี่ยนแปลงข้อมูลใน form
   const hdlChange = (e) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // ฟังก์ชันสำหรับการส่งข้อมูลหลังจากการกรอกฟอร์ม
   const hdlSubmit = async (e) => {
     try {
       e.preventDefault();
-      // Validation
+      // ตรวจสอบความตรงกันระหว่างรหัสผ่านและยืนยันรหัสผ่าน
       if (input.password !== input.confirmPassword) {
         return alert("Please check confirm password");
       }
+      // ส่งข้อมูลลงทะเบียนไปยัง API
       const rs = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, input);
       console.log(rs);
       if (rs.status === 200) {
-        // Display success message using SweetAlert
+        // แสดงข้อความสำเร็จเมื่อสมัครเสร็จ
         Swal.fire({
           title: "Good job!",
           text: "Register Successful",
           icon: "success",
         });
-        navigate("/login")
+        // เปลี่ยนเส้นทางไปยังหน้าล็อกอิน
+        navigate("/login");
       }
     } catch (err) {
       console.log(err.message);
