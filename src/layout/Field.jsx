@@ -83,14 +83,14 @@ export default function Field() {
   const handleDeleteField = async (id) => {
     try {
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover this field!",
+        title: "ต้องการลบใช่ไหม?",
+        text: "",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
       });
 
       if (result.isConfirmed) {
@@ -144,9 +144,7 @@ export default function Field() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-semibold text-gray-900">
-            Manage Fields
-          </h1>
+          <h1 className="text-4xl font-semibold text-gray-900">สนาม</h1>
           <p className="text-gray-600 mt-2">
             View, edit, and manage all sports fields in your system
           </p>
@@ -158,18 +156,18 @@ export default function Field() {
             className="btn btn-primary"
             onClick={() => setIsAddFieldOpen(true)} // เปิดฟอร์มการเพิ่มฟิลด์
           >
-            Add New Field
+            เพิ่มสนาม
           </button>
         </div>
 
         {/* Search Section */}
         <div className="form-control w-full max-w-xs mb-6">
           <label className="label">
-            <span className="label-text">Search Fields</span>
+            <span className="label-text">ค้นหาสนาม</span>
           </label>
           <input
             type="text"
-            placeholder="Search by field name"
+            placeholder="ค้นหา"
             className="input input-bordered w-full"
           />
         </div>
@@ -184,9 +182,9 @@ export default function Field() {
             <table className="table table-zebra w-full">
               <thead>
                 <tr>
-                  <th>Field Name</th>
-                  <th>Location</th>
-                  <th>Price per Hour</th>
+                  <th>ชื่อสนาม</th>
+                  <th>ที่ตั้ง</th>
+                  <th>ราคา/ชั่วโมง</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -201,13 +199,13 @@ export default function Field() {
                         className="btn btn-warning btn-sm mr-2"
                         onClick={() => handleEditClick(field)} // เลือกฟิลด์เพื่อแก้ไข
                       >
-                        Edit
+                        แก้ไข
                       </button>
                       <button
                         className="btn btn-error btn-sm"
                         onClick={() => handleDeleteField(field.id)} // ลบฟิลด์
                       >
-                        Delete
+                        ลบ
                       </button>
                     </td>
                   </tr>
@@ -221,7 +219,7 @@ export default function Field() {
         {isAddFieldOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-xl shadow-xl w-1/3">
-              <h2 className="text-xl font-semibold mb-4">Add New Field</h2>
+              <h2 className="text-xl font-semibold mb-4">เพิ่มสนาม</h2>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -229,7 +227,7 @@ export default function Field() {
                 }}
               >
                 <div className="mb-4">
-                  <label className="label">Field Name</label>
+                  <label className="label">ชื่อสนาม</label>
                   <input
                     type="text"
                     name="name"
@@ -240,7 +238,7 @@ export default function Field() {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="label">Location</label>
+                  <label className="label">ที่ตั้ง</label>
                   <input
                     type="text"
                     name="location"
@@ -251,7 +249,7 @@ export default function Field() {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="label">Price per Hour</label>
+                  <label className="label">ราคา/ชั่วโมง</label>
                   <input
                     type="number"
                     name="pricePerHour"
@@ -263,14 +261,14 @@ export default function Field() {
                 </div>
                 <div className="flex justify-end">
                   <button type="submit" className="btn btn-primary mr-2">
-                    Add Field
+                    เพิ่ม
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={() => setIsAddFieldOpen(false)} // ปิดฟอร์ม
                   >
-                    Cancel
+                    ยกเลิก
                   </button>
                 </div>
               </form>
@@ -282,7 +280,7 @@ export default function Field() {
         {editingField && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-xl shadow-xl w-1/3">
-              <h2 className="text-xl font-semibold mb-4">Edit Field</h2>
+              <h2 className="text-xl font-semibold mb-4">แก้ไขสนาม</h2>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -290,7 +288,7 @@ export default function Field() {
                 }}
               >
                 <div className="mb-4">
-                  <label className="label">Field Name</label>
+                  <label className="label">ชื่อสนาม</label>
                   <input
                     type="text"
                     name="name"
@@ -301,7 +299,7 @@ export default function Field() {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="label">Location</label>
+                  <label className="label">ที่ตั้ง</label>
                   <input
                     type="text"
                     name="location"
@@ -312,7 +310,7 @@ export default function Field() {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="label">Price per Hour</label>
+                  <label className="label">ราคา/ชั่วโมง</label>
                   <input
                     type="number"
                     name="pricePerHour"
@@ -324,14 +322,14 @@ export default function Field() {
                 </div>
                 <div className="flex justify-end">
                   <button type="submit" className="btn btn-primary mr-2">
-                    Save Changes
+                    บันทึก
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={() => setEditingField(null)} // ปิดฟอร์ม
                   >
-                    Cancel
+                    ยกเลิก
                   </button>
                 </div>
               </form>

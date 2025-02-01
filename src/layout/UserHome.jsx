@@ -5,7 +5,10 @@ function UserHome() {
     <div>
       <div className="carousel w-full">
         <div id="slide1" className="carousel-item relative w-full">
-          <img src="https://i.postimg.cc/ncMb2tGZ/OT.jpg" className="w-full h-96 object-cover" />
+          <img
+            src="https://i.postimg.cc/ncMb2tGZ/OT.jpg"
+            className="w-full h-96 object-cover"
+          />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide4" className="btn btn-circle">
               ❮
@@ -16,7 +19,10 @@ function UserHome() {
           </div>
         </div>
         <div id="slide2" className="carousel-item relative w-full">
-          <img src="https://i.postimg.cc/jqH9sFgP/ball.webp" className="w-full h-96 object-cover" />
+          <img
+            src="https://i.postimg.cc/jqH9sFgP/ball.webp"
+            className="w-full h-96 object-cover"
+          />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide1" className="btn btn-circle">
               ❮
@@ -27,7 +33,10 @@ function UserHome() {
           </div>
         </div>
         <div id="slide3" className="carousel-item relative w-full">
-          <img src="https://i.postimg.cc/0ykFb0Mj/ball2.jpg" className="w-full h-96 object-cover" />
+          <img
+            src="https://i.postimg.cc/0ykFb0Mj/ball2.jpg"
+            className="w-full h-96 object-cover"
+          />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide2" className="btn btn-circle">
               ❮
@@ -38,7 +47,10 @@ function UserHome() {
           </div>
         </div>
         <div id="slide4" className="carousel-item relative w-full">
-          <img src="https://i.postimg.cc/ZYjrJPSV/ball3.webp" className="w-full h-96 object-cover" />
+          <img
+            src="https://i.postimg.cc/ZYjrJPSV/ball3.webp"
+            className="w-full h-96 object-cover"
+          />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
             <a href="#slide3" className="btn btn-circle">
               ❮
@@ -49,11 +61,9 @@ function UserHome() {
           </div>
         </div>
       </div>
-      <h1 className="card-title mt-10 ms-80">IN CASE YOU MISSED IT</h1>
+      <h1 className="card-title mt-10 ms-80">Keerati Arena Sports Club</h1>
       <form className="flex justify-center mt-5 ">
-        
         <div className="flex justify-center">
-          
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img

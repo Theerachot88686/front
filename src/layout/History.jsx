@@ -8,7 +8,8 @@ function History() {
   const [fields, setFields] = useState([]); // สถานะสำหรับเก็บข้อมูลสนาม
   const [bookings, setBookings] = useState([]); // สถานะสำหรับเก็บข้อมูลการจอง
   const [editingBookingId, setEditingBookingId] = useState(null); // สถานะสำหรับจัดการการแก้ไขการจอง
-  const [editedBooking, setEditedBooking] = useState({ // สถานะสำหรับเก็บข้อมูลการจองที่แก้ไข
+  const [editedBooking, setEditedBooking] = useState({
+    // สถานะสำหรับเก็บข้อมูลการจองที่แก้ไข
     startTime: "",
     endTime: "",
     status: "",
@@ -46,9 +47,9 @@ function History() {
     fetchData();
   }, []); // ดึงข้อมูลสนามเมื่อ Component โหลดครั้งแรก
 
-  // ฟังก์ชันสำหรับฟอร์แมตวันที่และเวลาให้เป็นรูปแบบ "YYYY-MM-DD HH:mm:ss"
+  // ฟังก์ชันสำหรับฟอร์แมตวันที่และเวลาให้เป็นรูปแบบ "YYYY-MM-DD HH:mm"
   const formatDateTime = (dateTime) => {
-    return dayjs(dateTime).format("YYYY-MM-DD HH:mm:ss");
+    return dayjs(dateTime).format("DD/MM/YYYY HH:mm");
   };
 
   // ฟังก์ชันคำนวณราคาทั้งหมดของการจอง โดยใช้ราคาเป็นรายชั่วโมงของสนาม
@@ -87,8 +88,8 @@ function History() {
       await axios.delete(
         `https://back-2-hqew.onrender.com/booking/bookings/${id}`
       ); // เรียก API เพื่อลบการจอง
-      setBookings((prevBookings) =>
-        prevBookings.filter((booking) => booking.id !== id) // ลบการจองออกจาก state
+      setBookings(
+        (prevBookings) => prevBookings.filter((booking) => booking.id !== id) // ลบการจองออกจาก state
       );
 
       console.log("Booking deleted successfully"); // แสดงข้อความใน console
@@ -138,7 +139,8 @@ function History() {
                   {/* แสดงชื่อสนามที่ตรงกับ fieldId ของการจอง */}
                   {fields.find((field) => field.id === booking.fieldId)?.name}
                 </td>
-                <td>{calculateTotalPrice(booking.id)}</td> {/* แสดงราคารวม */}
+                <td>{calculateTotalPrice(booking.id)} บาท</td>{" "}
+                {/* แสดงราคารวม */}
                 <td>{booking.status}</td>
                 <td>
                   {editingBookingId === booking.id ? (

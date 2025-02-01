@@ -1,58 +1,52 @@
-import axios from "axios"; // นำเข้า Axios สำหรับการทำ API requests
-import { useState } from "react"; // นำเข้า useState สำหรับการจัดการสถานะใน React
-import { useNavigate } from "react-router-dom"; // นำเข้า useNavigate สำหรับการนำทางใน React Router
-import useAuth from "../hooks/useAuth"; // นำเข้า custom hook useAuth สำหรับการจัดการข้อมูลผู้ใช้
-import Swal from "sweetalert2"; // นำเข้า SweetAlert2 สำหรับการแสดงข้อความแจ้งเตือน
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import Swal from "sweetalert2";
 
 export default function LoginForm() {
-  const { setUser , run } = useAuth(); // ใช้ useAuth hook เพื่อตั้งค่าผู้ใช้และเรียกใช้งานการตั้งค่าผู้ใช้
-  const navigate = useNavigate(); // ใช้ useNavigate เพื่อทำการนำทางไปยังหน้าอื่น ๆ
+  const { setUser, run } = useAuth();
+  const navigate = useNavigate();
   const [input, setInput] = useState({
     username: "",
     password: "",
-  }); // สถานะสำหรับเก็บข้อมูลจากฟอร์มการเข้าสู่ระบบ
+  });
 
-  // ฟังก์ชันสำหรับการเปลี่ยนแปลงค่าของ input ในฟอร์ม
   const hdlChange = (e) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ฟังก์ชันสำหรับการส่งข้อมูลฟอร์มเข้าสู่ระบบ
   const hdlSubmit = async (e) => {
     try {
-      e.preventDefault(); // ป้องกันการรีเฟรชหน้าจอเมื่อส่งฟอร์ม
-      // ส่งข้อมูลเข้าสู่ระบบไปยัง API
-      const rs = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, input);
-      console.log(rs.data); // แสดงข้อมูลที่ได้รับจาก API
+      e.preventDefault();
+      const rs = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        input
+      );
+      console.log(rs.data);
 
-      // เก็บข้อมูลผู้ใช้ใน localStorage
       localStorage.setItem("userData", JSON.stringify(rs.data));
-      setUser(rs.data.data); // ตั้งค่าผู้ใช้ใน context ของแอป
+      setUser(rs.data.data);
 
-      // แสดงข้อความแจ้งเตือนเมื่อเข้าสู่ระบบสำเร็จ
       Swal.fire({
         title: "Good job!",
         text: "ยินดีต้อนรับ",
-        icon: "success"
+        icon: "success",
       });
 
-      // เลื่อนการนำทางไปหน้าถัดไปภายใน 2 วินาที
       setTimeout(() => {
-        // หากผู้ใช้มีบทบาทเป็น admin ให้นำทางไปยังหน้าจัดการ
-        if(rs.data.role === "admin"){
-          run(); // เรียกใช้งานฟังก์ชัน run จาก useAuth
+        if (rs.data.role === "admin") {
+          run();
           navigate("/admin/manage");
         } else {
           run();
-          navigate("/"); // นำทางไปยังหน้าโฮม
+          navigate("/");
         }
       }, 2000);
-
     } catch (err) {
-      // แสดงข้อความแจ้งเตือนหากเข้าสู่ระบบล้มเหลว
       Swal.fire({
         title: "Error!",
-        text: "Incorrect username or password",
+        text: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
         icon: "error",
       });
     }
@@ -62,7 +56,7 @@ export default function LoginForm() {
     <div className="hero min-h-screen -mt-10">
       <div className="hero-content flex-col lg:flex-row-reverse">
         <div className="text-center lg:text-left">
-          <h1 className="text-5xl font-bold">Football Club</h1>
+          <h1 className="text-5xl font-bold">Keerati Arena Sports Club</h1>
           <p className="py-6">
             Manchester United are in Premier League action again this weekend,
             facing Luton Town on our first top-flight visit to Kenilworth Road
@@ -104,6 +98,14 @@ export default function LoginForm() {
             <div className="form-control mt-6">
               <button type="submit" className="btn btn-success w-full">
                 เข้าสู่ระบบ
+              </button>
+            </div>
+            <div className="form-control mt-2 text-center">
+              <button
+                onClick={() => navigate("/request-reset-password")}
+                className="text-blue-500"
+              >
+                ลืมรหัสผ่าน?
               </button>
             </div>
           </form>

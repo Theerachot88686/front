@@ -1,43 +1,46 @@
-import { Link, useNavigate } from 'react-router-dom' // นำเข้า Link และ useNavigate จาก react-router-dom สำหรับการทำการนำทางในแอป
-import useAuth from '../hooks/useAuth'; // นำเข้า custom hook useAuth ที่ใช้จัดการข้อมูลผู้ใช้และการล็อกอิน/ล็อกเอาต์
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 // กำหนดเมนูการนำทางสำหรับผู้เยี่ยมชม (guest)
 const guestNav = [
-  { to: '/user-reserve', text: 'จองสนาม' }, // เมนูสำหรับการจองสนาม
-  { to: '/login', text: 'เข้าสู่ระบบ' }, // เมนูเข้าสู่ระบบ
-  { to: '/register', text: 'สมัครสมาชิก' }, // เมนูสมัครสมาชิก
-]
+  { to: "/user-reserve", text: "จองสนาม" }, // เมนูสำหรับการจองสนาม
+  { to: "/login", text: "เข้าสู่ระบบ" }, // เมนูเข้าสู่ระบบ
+  { to: "/register", text: "สมัครสมาชิก" }, // เมนูสมัครสมาชิก
+];
 
 // กำหนดเมนูการนำทางสำหรับผู้ใช้ที่ล็อกอินแล้ว (user)
 const userNav = [
-  { to: '/', text: 'หน้าหลัก' }, // เมนูสำหรับหน้าหลัก
-  { to: '/history', text: 'ประวัติการจอง' }, // เมนูสำหรับประวัติการจอง
-  { to: '/user-reserve', text: 'จองสนาม' }, // เมนูสำหรับการจองสนาม
-]
+  { to: "/", text: "หน้าหลัก" }, // เมนูสำหรับหน้าหลัก
+  { to: "/history", text: "ประวัติการจอง" }, // เมนูสำหรับประวัติการจอง
+  { to: "/user-reserve", text: "จองสนาม" }, // เมนูสำหรับการจองสนาม
+];
 
 // กำหนดเมนูการนำทางสำหรับผู้ดูแลระบบ (admin)
 const adminNav = [
-  { to: '/admin/manage', text: 'การจัดการ' }, // เมนูสำหรับการจัดการ
-]
+  { to: "/admin/manage", text: "การจัดการ" }, // เมนูสำหรับการจัดการ
+];
 
 export default function Header() {
   // ใช้ useAuth hook เพื่อดึงข้อมูลผู้ใช้และฟังก์ชัน logout
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth();
 
   // กำหนดเมนูที่จะใช้แสดงขึ้นอยู่กับบทบาทของผู้ใช้
-  const finalNav = user?.role === "admin" ? adminNav : user?.id ? userNav : guestNav
+  const finalNav =
+    user?.role === "admin" ? adminNav : user?.id ? userNav : guestNav;
 
   // ใช้ useNavigate สำหรับการเปลี่ยนเส้นทาง
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // ฟังก์ชันสำหรับการออกจากระบบ
   const hdlLogout = () => {
-    logout() // เรียกใช้ฟังก์ชัน logout ที่ดึงมาจาก useAuth
-    navigate('/') // หลังจากออกจากระบบแล้วให้กลับไปยังหน้าหลัก
-  }
+    logout(); // เรียกใช้ฟังก์ชัน logout ที่ดึงมาจาก useAuth
+    navigate("/"); // หลังจากออกจากระบบแล้วให้กลับไปยังหน้าหลัก
+  };
 
   return (
-    <div className="navbar bg-base-100"> {/* แสดง Navbar */}
+    <div className="navbar bg-base-100">
+      {" "}
+      {/* แสดง Navbar */}
       <div className="flex-1">
         {/* ลิงก์สำหรับไปหน้าหลัก */}
         <Link to="/" className="btn btn-ghost text-xl">
@@ -46,17 +49,23 @@ export default function Header() {
         </Link>
       </div>
       <div className="flex-none">
-        <ul className="menu menu-horizontal px-1"> {/* แสดงรายการเมนู */}
+        <ul className="menu menu-horizontal px-1">
+          {" "}
+          {/* แสดงรายการเมนู */}
           {/* แสดงเมนูตามบทบาทของผู้ใช้ (guest, user, admin) */}
-          {finalNav.map(el => (
+          {finalNav.map((el) => (
             <li key={el.to}>
-              <Link to={el.to}>{el.text}</Link> {/* เชื่อมโยงเมนูไปยังเส้นทางที่กำหนด */}
+              <Link to={el.to}>{el.text}</Link>{" "}
+              {/* เชื่อมโยงเมนูไปยังเส้นทางที่กำหนด */}
             </li>
           ))}
           {/* ถ้าผู้ใช้ล็อกอินอยู่ ให้แสดงเมนูออกจากระบบ */}
           {user?.id && (
             <li>
-              <Link to="/" onClick={hdlLogout}>ออกจากระบบ</Link> {/* ลิงก์ออกจากระบบ */}
+              <Link to="/" onClick={hdlLogout}>
+                ออกจากระบบ
+              </Link>{" "}
+              {/* ลิงก์ออกจากระบบ */}
             </li>
           )}
         </ul>

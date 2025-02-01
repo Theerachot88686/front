@@ -36,7 +36,7 @@ function AuthContextProvider(props) {
   // ส่งค่า user, setUser, loading, logout, และ run ผ่าน AuthContext.Provider
   return (
     <AuthContext.Provider value={ {user, setUser, loading, logout, run} }>
-      {props.children}  // Render children component ที่ถูกห่อหุ้มด้วย AuthContextProvider
+      {props.children}
     </AuthContext.Provider>
   )
 }

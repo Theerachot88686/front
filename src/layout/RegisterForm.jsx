@@ -10,7 +10,7 @@ export default function RegisterForm() {
     confirmPassword: "",
     email: "",
   });
-
+  const navigate = useNavigate();
   // ฟังก์ชันสำหรับการเปลี่ยนแปลงข้อมูลใน form
   const hdlChange = (e) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -25,7 +25,10 @@ export default function RegisterForm() {
         return alert("Please check confirm password");
       }
       // ส่งข้อมูลลงทะเบียนไปยัง API
-      const rs = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, input);
+      const rs = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        input
+      );
       console.log(rs);
       if (rs.status === 200) {
         // แสดงข้อความสำเร็จเมื่อสมัครเสร็จ
@@ -33,9 +36,12 @@ export default function RegisterForm() {
           title: "Good job!",
           text: "Register Successful",
           icon: "success",
+        }).then(() => {
+          // ใช้ setTimeout เพื่อเพิ่มดีเลย์ 2 วินาที ก่อนที่จะเปลี่ยนเส้นทาง
+          setTimeout(() => {
+            navigate("/login"); // เปลี่ยนเส้นทางไปยังหน้าล็อกอิน
+          }, 2000); // ดีเลย์ 2 วินาที
         });
-        // เปลี่ยนเส้นทางไปยังหน้าล็อกอิน
-        navigate("/login");
       }
     } catch (err) {
       console.log(err.message);
