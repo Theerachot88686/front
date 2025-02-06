@@ -1,3 +1,5 @@
+//ไม่ได้ใช้ เก็บไว้ก่อน
+
 import React, { useState, useEffect } from "react"; // นำเข้า React, useState และ useEffect จาก React สำหรับจัดการสถานะและการดึงข้อมูล
 import axios from "axios"; // นำเข้า Axios สำหรับทำการเรียก API
 import dayjs from "dayjs"; // นำเข้า dayjs สำหรับจัดการวันที่และเวลา
@@ -86,7 +88,7 @@ function History() {
   const handleDeleteBooking = async (id) => {
     try {
       await axios.delete(
-        `https://back-2-hqew.onrender.com/booking/bookings/${id}`
+        `${import.meta.env.VITE_API_URL}/booking/bookings/${id}`
       ); // เรียก API เพื่อลบการจอง
       setBookings(
         (prevBookings) => prevBookings.filter((booking) => booking.id !== id) // ลบการจองออกจาก state

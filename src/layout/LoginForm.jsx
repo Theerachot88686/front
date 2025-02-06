@@ -32,6 +32,11 @@ export default function LoginForm() {
         title: "Good job!",
         text: "ยินดีต้อนรับ",
         icon: "success",
+        customClass: {
+          title: "text-blue-600", // สีของหัวข้อ
+          content: "text-gray-800", // สีของข้อความ
+          confirmButton: "bg-green-500 text-white hover:bg-green-600", // สีของปุ่มยืนยัน
+        },
       });
 
       setTimeout(() => {
@@ -48,6 +53,11 @@ export default function LoginForm() {
         title: "Error!",
         text: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
         icon: "error",
+        customClass: {
+          title: "text-red-600", // สีของหัวข้อ (แดง)
+          content: "text-gray-800", // สีของข้อความ (เทาเข้ม)
+          confirmButton: "bg-red-500 text-white hover:bg-red-600", // สีของปุ่มยืนยัน (แดง)
+        },
       });
     }
   };

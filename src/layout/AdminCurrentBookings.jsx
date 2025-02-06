@@ -1,5 +1,3 @@
-//ไม่ได้ใช้ เก็บไว้ก่อน
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -9,39 +7,27 @@ import "react-calendar/dist/Calendar.css";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
-export default function BookingField() {
-  // สถานะต่างๆ สำหรับการจัดการข้อมูลการจอง
-  const [bookings, setBookings] = useState([]); // เก็บข้อมูลการจองทั้งหมด
-  const [loading, setLoading] = useState(true); // สถานะการโหลดข้อมูล
-  const { user } = useAuth(); // ดึงข้อมูลผู้ใช้จาก context (AuthContext)
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
+export default function AdminCurrentBookings() {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  // สถานะสำหรับการแก้ไขการจอง
+  const [isAddBookingOpen, setIsAddBookingOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    dueDate: dayjs().format("YYYY-MM-DD"),
+    startTime: "",
+    endTime: "",
+    selectedField: "",
+    userId: "",
+  });
+  const [fields, setFields] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [existingBookings, setExistingBookings] = useState([]);
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [bookedTimes, setBookedTimes] = useState([]);
+  const [selectedFieldPrice, setSelectedFieldPrice] = useState(0);
   const [editingBooking, setEditingBooking] = useState(null);
 
-  // สถานะสำหรับการเปิด/ปิดฟอร์มการเพิ่มการจอง
-  const [isAddBookingOpen, setIsAddBookingOpen] = useState(false);
-
-  // ข้อมูลฟอร์มการจอง
-  const [formData, setFormData] = useState({
-    dueDate: dayjs().format("YYYY-MM-DD"), // วันที่ที่กำหนดให้เป็นวันนี้
-    startTime: "", // เวลาที่เริ่มต้นของการจอง
-    endTime: "", // เวลาที่สิ้นสุดของการจอง
-    selectedField: "", // ฟิลด์ที่เลือก
-    userId: "", // รหัสผู้ใช้
-  });
-
-  // สถานะเพิ่มเติม
-  const [fields, setFields] = useState([]); // รายการสนาม
-  const [users, setUsers] = useState([]); // รายชื่อผู้ใช้
-  const [existingBookings, setExistingBookings] = useState([]); // การจองที่มีอยู่ในวันที่เลือก
-  const [calendarDate, setCalendarDate] = useState(new Date()); // วันที่ที่เลือกจากปฏิทิน
-  const [bookedTimes, setBookedTimes] = useState([]); // เวลาที่จองแล้วในวันที่เลือก
-  const [selectedFieldPrice, setSelectedFieldPrice] = useState(0); // ราคาสนามที่เลือก
-
-  // ช่วงเวลาในการจองที่มี
   const timeSlots = [
     "08:00",
     "09:00",
@@ -61,59 +47,82 @@ export default function BookingField() {
     "23:00",
   ];
 
-  // ดึงข้อมูลการจองทั้งหมดเมื่อ component ถูกติดตั้ง
+  // เพิ่ม State สำหรับติดตามการเลือก
+  const [selectionStart, setSelectionStart] = useState(null);
+  const [tempEndTime, setTempEndTime] = useState(null);
+
+  // ฟังก์ชันจัดการการเลือกเวลาใหม่
+  const handleSlotInteraction = (slot) => {
+    const isBooked = bookedTimes.some(
+      (t) => slot >= t.startTime && slot < t.endTime
+    );
+    if (isBooked) return;
+
+    if (!formData.startTime) {
+      // เริ่มเลือกเวลาใหม่
+      setFormData((prev) => ({
+        ...prev,
+        startTime: slot,
+        endTime: "",
+      }));
+      setSelectionStart(slot);
+    } else {
+      // จบการเลือกช่วงเวลา
+      const startIndex = timeSlots.indexOf(formData.startTime);
+      const endIndex = timeSlots.indexOf(slot);
+      const [start, end] = [
+        Math.min(startIndex, endIndex),
+        Math.max(startIndex, endIndex),
+      ];
+
+      const newStart = timeSlots[start];
+      const newEnd = timeSlots[end]
+        ? `${parseInt(timeSlots[end].split(":")[0]) + 1}:00`
+        : `${parseInt(slot.split(":")[0]) + 1}:00`;
+
+      setFormData((prev) => ({
+        ...prev,
+        startTime: newStart,
+        endTime: newEnd,
+      }));
+      setSelectionStart(null);
+    }
+  };
+
+  // ฟังก์ชันเมื่อเมาส์ hover บนตารางเวลา
+  const handleMouseOver = (slot) => {
+    if (formData.startTime && !formData.endTime) {
+      const startIndex = timeSlots.indexOf(formData.startTime);
+      const currentIndex = timeSlots.indexOf(slot);
+      const [start, end] = [
+        Math.min(startIndex, currentIndex),
+        Math.max(startIndex, currentIndex),
+      ];
+      setTempEndTime(timeSlots[end]);
+    }
+  };
+
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/booking`
-        );
-        setBookings(response.data); // อัพเดทสถานะ bookings ด้วยข้อมูลที่ดึงมา
+        const [bookingsRes, fieldsRes, usersRes] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_API_URL}/booking/bookings/current`),
+          axios.get(`${import.meta.env.VITE_API_URL}/field`),
+          axios.get(`${import.meta.env.VITE_API_URL}/auth/users`),
+        ]);
+        setBookings(bookingsRes.data);
+        setFields(fieldsRes.data);
+        setUsers(usersRes.data);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
-        Swal.fire(
-          "Error!",
-          "There was an error fetching the bookings.",
-          "error"
-        );
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchBookings();
+    fetchData();
   }, []);
 
-  // ดึงข้อมูลสนามฟุตบอล
-  useEffect(() => {
-    async function fetchFields() {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/field`
-        );
-        setFields(response.data);
-      } catch (error) {
-        console.error("Error fetching fields:", error);
-      }
-    }
-    fetchFields();
-  }, []);
-
-  // ดึงข้อมูลผู้ใช้
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/auth/users`
-        );
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    }
-    fetchUsers();
-  }, []);
-
-  // ดึงข้อมูลการจองที่มีอยู่ตามวันที่ที่เลือก
+  // ... (Keep all the same functions as original for handling CRUD operations)
   useEffect(() => {
     fetchBookingsByDate(dayjs(calendarDate).format("YYYY-MM-DD"));
   }, [calendarDate]);
@@ -165,9 +174,9 @@ export default function BookingField() {
   // ฟังก์ชันคำนวณราคาทั้งหมด
   const calculateTotalCost = () => {
     if (!formData.startTime || !formData.endTime) return 0;
-    const start = new Date(`2000-01-01T${formData.startTime}`);
-    const end = new Date(`2000-01-01T${formData.endTime}`);
-    const hours = (end - start) / (1000 * 60 * 60);
+    const startHour = parseInt(formData.startTime.split(":")[0]);
+    const endHour = parseInt(formData.endTime.split(":")[0]);
+    const hours = endHour - startHour;
     return hours * selectedFieldPrice;
   };
 
@@ -233,6 +242,10 @@ export default function BookingField() {
           text: "มีการจองในช่วงเวลาดังกล่าวอยู่แล้ว",
           icon: "error",
           confirmButtonText: "ตกลง",
+          confirmButtonColor: "#d9534f", // เปลี่ยนสีปุ่ม "ตกลง" เป็นสีแดง
+          iconColor: "#d9534f", // เปลี่ยนสีของไอคอนเป็นสีแดง
+          background: "#f8d7da", // สีพื้นหลังของ Swal
+          showCloseButton: true, // เพิ่มปุ่มปิด
         }).then(() => {
           setTimeout(() => {
             navigate("/admin/manage/bookingfield");
@@ -260,6 +273,9 @@ export default function BookingField() {
           }\nราคาต่อชั่วโมง: ${selectedFieldPrice} บาท\nราคารวม: ${calculateTotalCost()} บาท`,
           icon: "success",
           confirmButtonText: "เรียบร้อย",
+          confirmButtonColor: "#28a745", // สีปุ่ม "เรียบร้อย" เป็นสีเขียว
+          iconColor: "#28a745", // เปลี่ยนสีไอคอนให้เป็นสีเขียว
+          background: "#d4edda", // เปลี่ยนพื้นหลังเป็นสีเขียวอ่อน
         }).then(() => {
           window.location.reload();
         });
@@ -274,6 +290,9 @@ export default function BookingField() {
         text: err.message,
         icon: "error",
         confirmButtonText: "ตกลง",
+        confirmButtonColor: "#dc3545", // เปลี่ยนสีปุ่ม "ตกลง" เป็นสีแดง
+        iconColor: "#dc3545", // เปลี่ยนสีของไอคอนให้เป็นสีแดง
+        background: "#f8d7da", // เปลี่ยนพื้นหลังเป็นสีแดงอ่อน
       }).then(() => {
         setTimeout(() => {
           navigate("/admin/manage/bookingfield");
@@ -309,11 +328,15 @@ export default function BookingField() {
       setEditingBooking(null);
       resetForm();
 
-      Swal.fire(
-        "Updated!",
-        "Booking details have been updated.",
-        "success"
-      ).then(() => {
+      Swal.fire({
+        title: "Updated!",
+        text: "Booking details have been updated.",
+        icon: "success",
+        confirmButtonText: "ตกลง",
+        confirmButtonColor: "#28a745", // ปรับสีปุ่ม "ตกลง" เป็นสีเขียว
+        iconColor: "#28a745", // ปรับสีไอคอนเป็นสีเขียว
+        background: "#d4edda", // ปรับพื้นหลังให้เป็นสีเขียวอ่อน
+      }).then(() => {
         setTimeout(() => {
           navigate("/admin/manage/bookingfield");
         }, 1000);
@@ -323,7 +346,15 @@ export default function BookingField() {
       const errorMessage =
         error.response?.data?.message ||
         "There was an error while updating the booking.";
-      Swal.fire("Error!", errorMessage, "error");
+      Swal.fire({
+        title: "Error!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "ตกลง",
+        confirmButtonColor: "#dc3545", // ปรับสีปุ่ม "ตกลง" เป็นสีแดง
+        iconColor: "#dc3545", // ปรับสีไอคอนเป็นสีแดง
+        background: "#f8d7da", // ปรับพื้นหลังให้เป็นสีแดงอ่อน
+      });
     }
   };
 
@@ -395,22 +426,24 @@ export default function BookingField() {
     if (booking.Payment && booking.Payment.slip) {
       // สมมุติว่า slip ที่ได้เก็บเป็น path ที่สัมพันธ์กับ backend
       const slipUrl = `${import.meta.env.VITE_API_URL}/${booking.Payment.slip}`;
-      Swal.fire({
-        title: "Payment Slip",
-        imageUrl: slipUrl,
-        imageAlt: "Payment Slip",
-        confirmButtonText: "Close",
-        width: "80%",
-        padding: "3em",
-      });
-    } else {
-      Swal.fire({
-        title: "No Slip",
-        text: "This booking does not have a payment slip.",
-        icon: "info",
-        confirmButtonColor: "#111",
-        confirmButtonText: "Close",
-      });
+      if (slipUrl) {
+        Swal.fire({
+          title: "Payment Slip",
+          imageUrl: slipUrl,
+          imageAlt: "Payment Slip",
+          confirmButtonText: "Close",
+          width: "80%", // ขนาดหน้าต่างของ Swal
+          padding: "3em", // ระยะห่างภายในกล่อง
+        });
+      } else {
+        Swal.fire({
+          title: "No Slip",
+          text: "This booking does not have a payment slip.",
+          icon: "info",
+          confirmButtonColor: "#111", // สีปุ่ม "Close"
+          confirmButtonText: "Close",
+        });
+      }
     }
   };
 
@@ -425,25 +458,42 @@ export default function BookingField() {
         showCancelButton: true,
         confirmButtonText: "ใช่, ยกเลิก",
         cancelButtonText: "ไม่ใช่",
+        confirmButtonColor: "#dc3545", // สีแดงสำหรับปุ่มยืนยันการยกเลิก
+        cancelButtonColor: "#6c757d",  // สีเทาอ่อนสำหรับปุ่มยกเลิก
+        background: "#fff3cd",  // พื้นหลังสีเหลืองอ่อนเพื่อให้ดูเด่น
+        iconColor: "#dc3545",  // สีไอคอนเป็นสีแดง
       });
+  
       if (result.isConfirmed) {
         const response = await axios.put(
-          `${import.meta.env.VITE_API_URL}/booking/bookings/${
-            booking.id
-          }/cancel`
+          `${import.meta.env.VITE_API_URL}/booking/bookings/${booking.id}/cancel`
         );
         if (response.status === 200) {
           setBookings((prev) =>
             prev.map((b) => (b.id === booking.id ? response.data : b))
           );
-          Swal.fire("ยกเลิกการจองสำเร็จ", "", "success");
+          Swal.fire({
+            title: "ยกเลิกการจองสำเร็จ",
+            text: "การจองของคุณถูกยกเลิกแล้ว",
+            icon: "success",
+            confirmButtonText: "ตกลง",
+            confirmButtonColor: "#28a745", // สีเขียวสำหรับปุ่มยืนยัน
+            iconColor: "#28a745",  // สีไอคอนเป็นสีเขียว
+          });
         }
       }
     } catch (error) {
       console.error("Error cancelling booking:", error);
-      Swal.fire("Error", "There was an error cancelling the booking", "error");
+      Swal.fire({
+        title: "Error",
+        text: "เกิดข้อผิดพลาดในการยกเลิกการจอง",
+        icon: "error",
+        confirmButtonText: "ตกลง",
+        confirmButtonColor: "#dc3545", // ปุ่มยืนยันสีแดง
+      });
     }
   };
+  
 
   const handleConfirmBooking = async (booking) => {
     try {
@@ -454,7 +504,10 @@ export default function BookingField() {
         showCancelButton: true,
         confirmButtonText: "ใช่, ยืนยัน",
         cancelButtonText: "ไม่ใช่",
+        confirmButtonColor: "#28a745", // ปรับสีปุ่มยืนยันเป็นสีเขียว
+        cancelButtonColor: "#dc3545",  // ปรับสีปุ่มยกเลิกเป็นสีแดง
       });
+      
       if (result.isConfirmed) {
         const response = await axios.put(
           `${import.meta.env.VITE_API_URL}/booking/bookings/${
@@ -465,7 +518,16 @@ export default function BookingField() {
           setBookings((prev) =>
             prev.map((b) => (b.id === booking.id ? response.data : b))
           );
-          Swal.fire("ยืนยันการจองสำเร็จ", "", "success");
+          Swal.fire({
+            title: "ยืนยันการจองสำเร็จ",
+            text: "การจองของคุณเสร็จสมบูรณ์แล้ว!",
+            icon: "success",
+            confirmButtonText: "ตกลง",
+            confirmButtonColor: "#28a745", // สีเขียวสำหรับปุ่มยืนยัน
+            background: "#f4fdf4", // พื้นหลังสีอ่อนเพื่อให้ดูสบายตา
+            iconColor: "#28a745", // สีของไอคอน (เขียว)
+          });
+          
         }
       }
     } catch (error) {
@@ -483,6 +545,10 @@ export default function BookingField() {
         showCancelButton: true,
         confirmButtonText: "ใช่, ทำเครื่องหมายสำเร็จ",
         cancelButtonText: "ไม่ใช่",
+        customClass: {
+          confirmButton: "bg-green-500 text-white hover:bg-green-600", // ปรับสีปุ่ม Confirm
+          cancelButton: "bg-red-500 text-white hover:bg-red-600", // ปรับสีปุ่ม Cancel
+        },
       });
       if (result.isConfirmed) {
         const response = await axios.put(
@@ -511,24 +577,61 @@ export default function BookingField() {
   const renderTimeSlots = () => {
     const slotsPerRow = 4;
     const rows = [];
+
+    // แปลงเวลาเริ่มต้นและสิ้นสุดเป็น index
+    const startIndex = timeSlots.indexOf(formData.startTime);
+    const endIndex = timeSlots.indexOf(
+      formData.endTime
+        ? `${parseInt(formData.endTime.split(":")[0]) - 1}:00`
+        : null
+    );
+
     for (let i = 0; i < timeSlots.length; i += slotsPerRow) {
       rows.push(timeSlots.slice(i, i + slotsPerRow));
     }
+
     return rows.map((row, rowIndex) => (
-      <div key={rowIndex} className="flex justify-between mb-2">
+      <div
+        key={rowIndex}
+        className="flex justify-between mb-2"
+        onMouseLeave={() => setTempEndTime(null)}
+      >
         {row.map((slot, index) => {
+          const currentIndex = timeSlots.indexOf(slot);
           const isBooked = bookedTimes.some(
             (time) => slot >= time.startTime && slot < time.endTime
           );
+
+          const isInRange =
+            (startIndex !== -1 &&
+              currentIndex >= Math.min(startIndex, endIndex) &&
+              currentIndex <= Math.max(startIndex, endIndex)) ||
+            (tempEndTime &&
+              currentIndex >=
+                Math.min(startIndex, timeSlots.indexOf(tempEndTime)) &&
+              currentIndex <=
+                Math.max(startIndex, timeSlots.indexOf(tempEndTime)));
+
+          const isFirst = currentIndex === Math.min(startIndex, endIndex);
+          const isLast = currentIndex === Math.max(startIndex, endIndex);
+
           return (
             <div
               key={index}
-              className={`w-1/5 text-center p-2 rounded ${
-                isBooked
-                  ? "bg-red-200 text-red-700 line-through cursor-not-allowed"
-                  : "bg-green-200 text-green-700 hover:bg-green-300 cursor-pointer"
-              }`}
-              title={isBooked ? "เวลานี้ถูกจองแล้ว" : "ว่าง"}
+              className={`w-1/5 text-center p-2 cursor-pointer transition-all
+                ${
+                  isBooked
+                    ? "bg-red-200 text-red-700 line-through cursor-not-allowed"
+                    : isInRange
+                    ? "bg-blue-500 text-white"
+                    : "bg-green-200 hover:bg-green-300"
+                }
+                ${isFirst ? "rounded-l-full" : ""}
+                ${isLast ? "rounded-r-full" : ""}
+                ${isInRange && !isFirst && !isLast ? "rounded-none" : ""}
+              `}
+              onClick={() => handleSlotInteraction(slot)}
+              onMouseEnter={() => handleMouseOver(slot)}
             >
               {slot}
             </div>
@@ -538,79 +641,17 @@ export default function BookingField() {
     ));
   };
 
-  useEffect(() => {
-    const currentDate = new Date();
-    setMonth(currentDate.getMonth() + 1); // เดือนเริ่มจาก 0 (มกราคม = 0)
-    setYear(currentDate.getFullYear()); // ปีปัจจุบัน
-  }, []);
-
-  // ฟังก์ชันสำหรับการดาวน์โหลดรายงานการจอง
-  const handleExport = async () => {
-    if (!month || !year) {
-      alert("กรุณากรอกเดือนและปี");
-      return;
-    }
-
-    try {
-      // ส่งคำขอไปยัง API ที่ backend
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/booking/export`,
-        {
-          params: { month, year },
-          responseType: "blob", // กำหนดให้รับข้อมูลเป็นไฟล์
-        }
-      );
-
-      // สร้าง URL สำหรับดาวน์โหลด
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `รายงานการจองประจำเดือน-${month}-${year}.csv`
-      ); // ตั้งชื่อไฟล์ที่ดาวน์โหลด
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link); // ลบลิงก์หลังจากดาวน์โหลด
-    } catch (error) {
-      console.error("Error exporting bookings:", error);
-      alert("ไม่สามารถส่งข้อมูลได้");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-semibold text-gray-900">การจอง</h1>
-          <p className="text-gray-600 mt-2">
-            View, edit, and manage all field bookings in your system
-          </p>
+          <h1 className="text-4xl font-semibold text-gray-900">
+            การจองปัจจุบัน
+          </h1>
+          <p className="text-gray-600 mt-2">จัดการการจองที่กำลังดำเนินการ</p>
         </div>
 
-        {/* ปุ่มสำหรับเปิดฟอร์มการเพิ่มการจองใหม่ */}
-        <h2 className="text-2xl font-semibold text-gray-900">
-            ดาวน์โหลดรายงานการจอง
-          </h2>
         <div className="mb-6">
-        <input
-              type="number"
-              placeholder="เดือน"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="input input-bordered w-32"
-            />
-            <input
-              type="number"
-              placeholder="ปี"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="input input-bordered w-32 ml-4"
-            />
-            <button className="btn btn-primary ml-4" onClick={handleExport}>
-              ดาวน์โหลดรายงาน
-            </button>
           <button className="btn btn-primary" onClick={handleAddBookingOpen}>
             เพิ่มการจองใหม่
           </button>
@@ -738,32 +779,28 @@ export default function BookingField() {
                       className="w-full px-3 py-2 border rounded-md mb-4"
                       required
                     />
-                    <div className="flex space-x-4 mb-4">
-                      <div className="w-1/2">
-                        <label className="block text-gray-700">
-                          เวลาเริ่มต้น
-                        </label>
-                        <input
-                          type="time"
-                          name="startTime"
-                          value={formData.startTime}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border rounded-md"
-                          required
-                        />
-                      </div>
-                      <div className="w-1/2">
-                        <label className="block text-gray-700">
-                          เวลาสิ้นสุด
-                        </label>
-                        <input
-                          type="time"
-                          name="endTime"
-                          value={formData.endTime}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border rounded-md"
-                          required
-                        />
+
+                    <div className="mb-4">
+                      <label className="block text-gray-700">
+                        ช่วงเวลาที่เลือก
+                      </label>
+                      <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                        {formData.startTime && formData.endTime ? (
+                          <div className="flex items-center text-green-600">
+                            <span className="mr-2">🕒</span>
+                            {`${formData.startTime} - ${formData.endTime}`}
+                            <span className="ml-2 text-gray-500">
+                              (ทั้งหมด{" "}
+                              {parseInt(formData.endTime.split(":")[0]) -
+                                parseInt(formData.startTime.split(":")[0])}{" "}
+                              ชั่วโมง)
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="text-gray-500">
+                            คลิกเลือกเวลาเริ่มต้นและสิ้นสุด
+                          </div>
+                        )}
                       </div>
                     </div>
                     <label className="block text-gray-700">เลือกสนาม</label>
@@ -823,8 +860,16 @@ export default function BookingField() {
                         fetchBookingsByDate(dayjs(date).format("YYYY-MM-DD"));
                       }}
                       value={calendarDate}
-                      className="mb-6"
+                      tileClassName={({ date, view }) => {
+                        // เพิ่มสีให้กับวันที่ถูกเลือก
+                        if (dayjs(date).isSame(calendarDate, "day")) {
+                          return "bg-blue-500 text-white"; // สีพื้นหลังฟ้าและข้อความขาว
+                        }
+                        return ""; // หากไม่ได้เลือกวันใดๆ ก็จะไม่เพิ่มคลาส
+                      }}
+                      className="mb-6 p-4 rounded-lg shadow-lg bg-white border border-gray-300" // ใช้ TailwindCSS ในการตกแต่ง
                     />
+
                     <div>
                       <h4 className="text-md font-medium mb-2">
                         การจองในวันที่{" "}
@@ -996,6 +1041,8 @@ export default function BookingField() {
             </div>
           </div>
         )}
+
+        {/* Table and Modals - Same structure as original but only for current bookings */}
       </div>
     </div>
   );

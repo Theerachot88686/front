@@ -14,18 +14,17 @@ export default function UserReserve() {
     startTime: "",
     endTime: "",
     selectedField: "",
-    status: "",
   });
-  const navigate = useNavigate(); // ใช้ useNavigate สำหรับนำทาง
+  const navigate = useNavigate();
   const [selectedTimes, setSelectedTimes] = useState([]);
-  const [selectedFieldPrice, setSelectedFieldPrice] = useState(0); // ใช้เก็บราคาสนามที่เลือก
-  const [fields, setFields] = useState([]); // ใช้เก็บรายการสนามที่มี
-  const [existingBookings, setExistingBookings] = useState([]); // ใช้เก็บรายการการจองที่มีอยู่แล้ว
-  const [calendarDate, setCalendarDate] = useState(new Date()); // ใช้เก็บวันที่ที่เลือกจากปฏิทิน
-  const [bookedTimes, setBookedTimes] = useState([]); // ใช้เก็บเวลาในการจองที่มีอยู่
+  const [selectedFieldPrice, setSelectedFieldPrice] = useState(0); // ราคาต่อชั่วโมงของสนามที่เลือก
+  const [fields, setFields] = useState([]); // รายการสนามทั้งหมด
+  const [existingBookings, setExistingBookings] = useState([]); // รายการจองที่มีอยู่แล้ว
+  const [calendarDate, setCalendarDate] = useState(new Date()); // วันที่ที่เลือกในปฏิทิน
+  const [bookedTimes, setBookedTimes] = useState([]); // เวลาที่ถูกจองแล้ว
 
+  // กำหนดช่วงเวลาที่สามารถจองได้
   const timeSlots = [
-    // กำหนดช่วงเวลาในการจอง
     "08:00",
     "09:00",
     "10:00",
@@ -44,86 +43,138 @@ export default function UserReserve() {
     "23:00",
   ];
 
-  const hdlChange = (e) => {
-    const { name, value } = e.target; // ดึงชื่อและค่าจากฟอร์ม
+  // แก้ไข State
+  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [selectionStart, setSelectionStart] = useState(null);
 
-    // เมื่อเลือกเวลาที่ต้องการ
+  // ฟังก์ชันจัดการการเลือกเวลาใหม่
+  const handleSlotInteraction = (slot, isShiftKey) => {
+    if (bookedTimes.some((t) => slot >= t.startTime && slot < t.endTime))
+      return;
+
+    let newSlots = [...selectedSlots];
+
+    if (isShiftKey && selectionStart) {
+      const startIdx = timeSlots.indexOf(selectionStart);
+      const endIdx = timeSlots.indexOf(slot);
+      const [start, end] = [
+        Math.min(startIdx, endIdx),
+        Math.max(startIdx, endIdx),
+      ];
+      newSlots = Array.from(
+        new Set([...newSlots, ...timeSlots.slice(start, end + 1)])
+      );
+    } else {
+      if (newSlots.includes(slot)) {
+        newSlots = newSlots.filter((s) => s !== slot);
+      } else {
+        newSlots.push(slot);
+      }
+      setSelectionStart(slot);
+    }
+
+    setSelectedSlots(newSlots);
+    updateBookingTimes(newSlots);
+  };
+
+  // ฟังก์ชันอัปเดตเวลาจอง
+  const updateBookingTimes = (slots) => {
+    if (slots.length === 0) {
+      setInput((prev) => ({ ...prev, startTime: "", endTime: "" }));
+      return;
+    }
+
+    const sorted = [...slots].sort();
+    const start = sorted[0];
+    const end = timeSlots[timeSlots.indexOf(sorted[sorted.length - 1]) + 1];
+
+    setInput((prev) => ({
+      ...prev,
+      startTime: start,
+      endTime:
+        end || `${parseInt(sorted[sorted.length - 1].split(":")[0]) + 1}:00`,
+    }));
+  };
+
+  const hdlChange = (e) => {
+    const { name, value } = e.target;
+
     if (name === "startTime" || name === "endTime") {
-      const [hours] = value.split(":"); // แยกชั่วโมงจากนาที
-      const adjustedTime = `${hours}:00`; // ตั้งค่านาทีเป็น 00
+      const [hours] = value.split(":");
+      const adjustedTime = `${hours}:00`;
 
       setInput((prev) => {
-        // ถ้าเป็นเวลาสิ้นสุดและเลือกแล้ว เราตั้งเวลาให้เป็น 1 ชั่วโมงหลังจากเวลาเริ่มต้น
         if (name === "endTime" && input.startTime) {
           const startHour = parseInt(input.startTime.split(":")[0]);
-          const endHour = startHour + 1; // เพิ่มเวลา 1 ชั่วโมง
-          const adjustedEndTime = `${endHour}:00`; // เวลาสิ้นสุดที่เพิ่มขึ้น 1 ชั่วโมง
-          return { ...prev, [name]: adjustedEndTime }; // อัพเดทเวลาสิ้นสุด
+          const endHour = startHour + 1;
+          const adjustedEndTime = `${endHour}:00`;
+          return { ...prev, [name]: adjustedEndTime };
         }
-        return { ...prev, [name]: adjustedTime }; // อัพเดทเวลาเริ่มต้น
+        return { ...prev, [name]: adjustedTime };
       });
     } else {
-      setInput((prevState) => ({ ...prevState, [name]: value })); // อัพเดทสถานะของ input
+      setInput((prevState) => ({ ...prevState, [name]: value }));
     }
 
     if (name === "selectedField") {
-      // หากเปลี่ยนสนาม
-      const price = calculateFieldPrice(value); // คำนวณราคาของสนามที่เลือก
-      setSelectedFieldPrice(price); // อัพเดทราคาของสนาม
+      const price = calculateFieldPrice(value);
+      setSelectedFieldPrice(price);
     }
 
     if (name === "dueDate") {
-      // หากเปลี่ยนวันที่
-      fetchBookings(value); // ดึงข้อมูลการจองในวันที่ใหม่
+      setCalendarDate(value); // ✅ อัปเดตวันที่ในปฏิทินเมื่อเลือกจาก input
+      fetchBookings(value);
     }
   };
 
   const calculateFieldPrice = (selectedField) => {
-    // คำนวณราคาต่อชั่วโมงของสนาม
-    const field = fields.find((field) => field.id == selectedField); // ค้นหาสนามที่เลือก
-    return field ? field.pricePerHour : 0; // คืนค่าราคาของสนาม หรือ 0 ถ้าไม่พบ
+    // ค้นหาสนามที่เลือกและคืนค่าราคาต่อชั่วโมง
+    const field = fields.find((field) => field.id == selectedField);
+    return field ? field.pricePerHour : 0;
   };
 
   const calculateTotalCost = () => {
-    // คำนวณราคาทั้งหมดจากเวลาที่เลือก
-    const start = new Date(`2000-01-01T${input.startTime}`);
-    const end = new Date(`2000-01-01T${input.endTime}`);
-    const hours = (end - start) / (1000 * 60 * 60); // คำนวณจำนวนชั่วโมงที่จอง
-    return hours * selectedFieldPrice; // คำนวณราคาทั้งหมด
+    if (!input.startTime || !input.endTime) return 0;
+    const startHour = parseInt(input.startTime.split(":")[0]);
+    const endHour = parseInt(input.endTime.split(":")[0]);
+    const hours = endHour - startHour;
+    return hours * selectedFieldPrice;
   };
 
   const fetchBookings = async (date) => {
-    // ฟังก์ชันดึงข้อมูลการจองจาก API ตามวันที่
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/booking/bookings/all?dueDate=${date}`
       );
+      // กรองเฉพาะสถานะที่ต้องการ และวันที่ตรงกัน
       const filteredBookings = response.data.filter(
-        (booking) => dayjs(booking.dueDate).format("YYYY-MM-DD") === date // กรองการจองตามวันที่
+        (booking) =>
+          dayjs(booking.dueDate).format("YYYY-MM-DD") === date &&
+          ["Pending", "Confirm", "Completed"].includes(booking.status)
       );
-      setExistingBookings(filteredBookings); // อัพเดทสถานะการจองที่มีอยู่แล้ว
+      setExistingBookings(filteredBookings);
       const times = filteredBookings.map((booking) => ({
         startTime: dayjs(booking.startTime).format("HH:mm"),
         endTime: dayjs(booking.endTime).format("HH:mm"),
       }));
-      setBookedTimes(times); // อัพเดทเวลาในการจองที่มีอยู่แล้ว
+      setBookedTimes(times);
     } catch (error) {
-      console.error("Error fetching existing bookings:", error); // ถ้ามีข้อผิดพลาดในการดึงข้อมูล
+      console.error("Error fetching existing bookings:", error);
     }
   };
 
   const checkDuplicateBooking = async (output) => {
-    // ฟังก์ชันตรวจสอบการจองซ้ำ
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/booking/bookings/${
           user.id
         }/id?dueDate=${output.dueDate}&fieldId=${output.fieldId}`
       );
-      const bookings = response.data;
+      const bookings = response.data.filter((booking) =>
+        ["Pending", "Confirm", "Completed"].includes(booking.status)
+      );
 
       return bookings.some((booking) => {
-        // ตรวจสอบว่าเวลาที่เลือกซ้ำกับการจองที่มีอยู่หรือไม่
         const existingStartTime = dayjs(booking.startTime);
         const existingEndTime = dayjs(booking.endTime);
         const inputStartTime = dayjs(output.startTime);
@@ -140,94 +191,161 @@ export default function UserReserve() {
         );
       });
     } catch (error) {
-      console.error("Error checking duplicate booking:", error); // ถ้ามีข้อผิดพลาดในการตรวจสอบ
+      console.error("Error checking duplicate booking:", error);
       return false;
     }
   };
 
   const hdlSubmit = async (e) => {
-    try {
-      e.preventDefault();
-      const output = {
-        startTime: dayjs(`${input.dueDate}T${input.startTime}`),
-        endTime: dayjs(`${input.dueDate}T${input.endTime}`),
-        dueDate: dayjs(`${input.dueDate}T${input.startTime}`),
-        totalCost: calculateTotalCost(),
-        status: input.status,
-        fieldId: parseInt(input.selectedField),
-      };
+    e.preventDefault();
 
-      const isDuplicate = await checkDuplicateBooking(output);
+    // ตรวจสอบว่าผู้ใช้เข้าสู่ระบบหรือไม่
+    if (!user || !user.id) {
+      Swal.fire({
+        title: "Error",
+        text: "กรุณาเข้าสู่ระบบ",
+        icon: "error",
+        confirmButtonText: "ตกลง",
+        customClass: {
+          title: "text-red-600", // สีของหัวข้อ (แดง)
+          content: "text-gray-800", // สีของข้อความ (เทาเข้ม)
+          confirmButton: "bg-red-500 text-white hover:bg-red-600", // สีของปุ่มตกลง (แดง)
+        },
+      });
+      return; // หยุดการทำงานหากยังไม่ได้เข้าสู่ระบบ
+    }
 
-      if (isDuplicate) {
-        Swal.fire({
-          title: "Error",
-          text: "มีการจองในช่วงเวลาดังกล่าวอยู่แล้ว",
-          icon: "error",
-          confirmButtonText: "ตกลง",
-        });
-        return;
-      }
+    // เตรียมข้อมูลสำหรับการจอง
+    const output = {
+      startTime: dayjs(`${input.dueDate}T${input.startTime}`),
+      endTime: dayjs(`${input.dueDate}T${input.endTime}`),
+      dueDate: dayjs(`${input.dueDate}T${input.startTime}`),
+      totalCost: calculateTotalCost(),
+      fieldId: parseInt(input.selectedField),
+    };
 
-      const rs = await axios.post(
-        `${import.meta.env.VITE_API_URL}/booking/bookings/create/${user.id}`,
-        output
-      );
+    // ตรวจสอบการจองซ้ำ
+    const isDuplicate = await checkDuplicateBooking(output);
+    if (isDuplicate) {
+      Swal.fire({
+        title: "Error",
+        text: "มีการจองในช่วงเวลาดังกล่าวอยู่แล้ว",
+        icon: "error",
+        confirmButtonText: "ตกลง",
+        customClass: {
+          title: "text-red-600",
+          content: "text-gray-800",
+          confirmButton: "bg-red-500 text-white hover:bg-red-600",
+        },
+      });
+      return;
+    }
 
-      if (rs.status === 200) {
-        const qrCodeUrl = `https://promptpay.io/0810841055/${calculateTotalCost()}.png`;
+    // สร้าง URL สำหรับ QR Code ตามยอดชำระเงินที่คำนวณได้
+    const qrCodeUrl = `https://promptpay.io/0810841055/${calculateTotalCost()}.png`;
 
-        Swal.fire({
-          title: "กรุณาชำระเงิน",
-          html: `
-            <p>กรุณาสแกน QR Code เพื่อชำระเงินก่อนดำเนินการต่อ</p>
-                <div style="display: flex; justify-content: center;">
-      <img src="${qrCodeUrl}" alt="QR Code" style="width:200px; height:200px;"/>
-    </div>
-            <p>วันที่จอง: ${input.dueDate}</p>
-            <p>เวลาเริ่มต้น: ${input.startTime}</p>
-            <p>เวลาสิ้นสุด: ${input.endTime}</p>
-            <p>สนามที่เลือก: ${
-              fields.find((field) => field.id === parseInt(input.selectedField))
-                ?.name
-            }</p>
-            <p>ราคาต่อชั่วโมง: ${selectedFieldPrice} บาท</p>
-            <p>ราคารวม: ${calculateTotalCost()} บาท</p>
-          `,
-          icon: "info",
-          showCancelButton: true,
-          confirmButtonText: "✅ ชำระเงินแล้ว",
-          cancelButtonText: "❌ ยกเลิก",
-          confirmButtonColor: "#28a745", // สีเขียว
-          cancelButtonColor: "#dc3545", // สีแดง
-        }).then((result) => {
-          if (result.isConfirmed) {
+    // แสดง SweetAlert2 ให้ผู้ใช้ชำระเงินและแนบสลิปการชำระเงิน
+    Swal.fire({
+      title: "กรุณาชำระเงินและแนบสลิป",
+      html: `
+        <p>กรุณาสแกน QR Code เพื่อชำระเงินก่อนดำเนินการต่อ</p>
+        <div style="display: flex; justify-content: center;">
+          <img src="${qrCodeUrl}" alt="QR Code" style="width:200px; height:200px;"/>
+        </div>
+        <p>วันที่จอง: ${input.dueDate}</p>
+        <p>เวลาเริ่มต้น: ${input.startTime}</p>
+        <p>เวลาสิ้นสุด: ${input.endTime}</p>
+        <p>สนามที่เลือก: ${
+          fields.find((field) => field.id === parseInt(input.selectedField))
+            ?.name
+        }</p>
+        <p>ราคาต่อชั่วโมง: ${selectedFieldPrice} บาท</p>
+        <p>ราคารวม: ${calculateTotalCost()} บาท</p>
+        <input type="file" id="swalFile" accept="image/*" style="margin-top: 10px;" />
+      `,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "✅ ชำระเงินแล้ว",
+      cancelButtonText: "❌ ยกเลิก",
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#dc3545",
+      preConfirm: () => {
+        const fileInput = document.getElementById("swalFile");
+        if (!fileInput || fileInput.files.length === 0) {
+          Swal.showValidationMessage("กรุณาแนบสลิปการชำระเงิน");
+        }
+        return fileInput.files[0];
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const slipFile = result.value;
+
+        const formData = new FormData();
+        formData.append(
+          "startTime",
+          dayjs(`${input.dueDate}T${input.startTime}`).toISOString()
+        );
+        formData.append(
+          "endTime",
+          dayjs(`${input.dueDate}T${input.endTime}`).toISOString()
+        );
+        formData.append(
+          "dueDate",
+          dayjs(`${input.dueDate}T${input.startTime}`).toISOString()
+        );
+        formData.append("totalCost", calculateTotalCost());
+        formData.append("fieldId", parseInt(input.selectedField));
+        formData.append("slip", slipFile);
+
+        try {
+          const rs = await axios.post(
+            `${import.meta.env.VITE_API_URL}/booking/bookings/create/${
+              user.id
+            }`,
+            formData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+          );
+
+          if (rs.status === 200) {
             Swal.fire({
               title: "Success",
               text: "ชำระเงินเรียบร้อย กรุณาบันทึกหน้าจอเพื่อให้พนักงานตรวจสอบ",
               icon: "success",
               confirmButtonText: "ตกลง",
+              customClass: {
+                title: "text-green-600",
+                content: "text-gray-800",
+                confirmButton: "bg-green-500 text-white hover:bg-green-600",
+              },
             });
+
             setTimeout(() => {
-              navigate("/history");
+              navigate("/current-bookings");
             }, 2000);
+          } else {
+            throw new Error("Failed to create booking.");
           }
-        });
+        } catch (err) {
+          Swal.fire({
+            title: "Error",
+            text: "เกิดข้อผิดพลาดในการบันทึกการจอง",
+            icon: "error",
+            confirmButtonText: "ตกลง",
+            customClass: {
+              title: "text-red-600",
+              content: "text-gray-800",
+              confirmButton: "bg-red-500 text-white hover:bg-red-600",
+            },
+          });
+        }
       } else {
-        throw new Error("Failed to create new.");
+        console.log("User cancelled the payment process.");
       }
-    } catch (err) {
-      Swal.fire({
-        title: "Error",
-        text: err.message,
-        icon: "error",
-        confirmButtonText: "ตกลง",
-      });
-    }
+    });
   };
 
   useEffect(() => {
-    // ดึงข้อมูลสนามทั้งหมดเมื่อเริ่มโหลด
+    // ดึงข้อมูลสนามทั้งหมดเมื่อ component โหลด
     async function fetchData() {
       try {
         const response = await axios.get(
@@ -235,120 +353,127 @@ export default function UserReserve() {
         );
         setFields(response.data);
       } catch (error) {
-        console.error("Error fetching fields:", error); // ถ้ามีข้อผิดพลาดในการดึงข้อมูลสนาม
+        console.error("Error fetching fields:", error);
       }
     }
     fetchData();
   }, []);
 
   useEffect(() => {
-    // ดึงข้อมูลการจองที่มีอยู่แล้วเมื่อวันที่ในปฏิทินเปลี่ยนแปลง
+    // ดึงข้อมูลการจองเมื่อวันที่ในปฏิทินเปลี่ยน
     fetchBookings(dayjs(calendarDate).format("YYYY-MM-DD"));
   }, [calendarDate]);
 
-  // ฟังก์ชั่นเลือกเวลา
+  // ฟังก์ชันสำหรับเลือกเวลาในตาราง
+  // แก้ไขฟังก์ชันจัดการการเลือกเวลา
   const handleSelectTime = (slot) => {
-    // ตรวจสอบว่าเวลานี้ถูกจองหรือยัง
     const isBooked = bookedTimes.some(
       (time) => slot >= time.startTime && slot < time.endTime
     );
 
-    if (isBooked) {
-      Swal.fire({
-        title: "ไม่สามารถเลือกเวลา",
-        text: "เวลานี้ถูกจองแล้ว",
-        icon: "error",
-        confirmButtonText: "ตกลง",
-      });
-    } else {
-      // ตรวจสอบว่าเวลานี้ถูกเลือกอยู่แล้วหรือไม่
-      const isSelected = selectedTimes.some((time) => time.startTime === slot);
+    if (isBooked) return;
 
-      if (isSelected) {
-        // หากเวลาถูกเลือกอยู่แล้ว, ให้ลบออกจาก selectedTimes (ยกเลิกการเลือก)
-        setSelectedTimes((prevTimes) =>
-          prevTimes.filter((time) => time.startTime !== slot)
-        );
-        // หากยกเลิกการเลือก ให้ตั้งค่ากลับเป็น null
-        setInput((prev) => ({
-          ...prev,
-          startTime: null,
-          endTime: null,
-        }));
-      } else {
-        // หากเวลาไม่ได้ถูกเลือก, ให้เพิ่มเวลานั้นลงใน selectedTimes
-        const startTime = slot; // เวลาที่เลือกจะเป็นเวลาเริ่มต้น
+    // หาตำแหน่งของ slot ที่คลิกใน timeSlots
+    const slotIndex = timeSlots.indexOf(slot);
 
-        // คำนวณเวลา endTime โดยบวก 1 ชั่วโมงจาก startTime
-        const startDate = new Date(`1970-01-01T${slot}:00`);
-        startDate.setHours(startDate.getHours() + 1); // เพิ่ม 1 ชั่วโมง
+    if (slotIndex === -1) return;
 
-        const endTime = startDate.toTimeString().substring(0, 5); // แปลงเวลาให้เป็นรูปแบบ HH:mm
-
-        setSelectedTimes((prevTimes) => [...prevTimes, { startTime, endTime }]);
-
-        // ตั้งค่า startTime และ endTime ในฟอร์ม
+    // กรณีไม่มีช่วงเวลาเลือก หรือกด Shift ค้างไว้เพื่อเลือกช่วง
+    if (!input.startTime || (input.startTime && !input.endTime)) {
+      if (!input.startTime) {
+        // เริ่มเลือกเวลาใหม่
         setInput((prev) => ({
           ...prev,
           startTime: slot,
-          endTime: endTime, // ตั้งค่า endTime ให้เป็นเวลาที่บวก 1 ชั่วโมง
+          endTime: "",
+        }));
+      } else {
+        // จบการเลือกช่วงเวลา
+        const startIndex = timeSlots.indexOf(input.startTime);
+        const endIndex = slotIndex;
+        const [start, end] = [
+          Math.min(startIndex, endIndex),
+          Math.max(startIndex, endIndex),
+        ];
+
+        // สร้างช่วงเวลาที่เลือกทั้งหมด
+        const selected = timeSlots.slice(start, end + 1);
+        const endTime = timeSlots[end]
+          ? `${parseInt(timeSlots[end].split(":")[0]) + 1}:00`
+          : `${parseInt(slot.split(":")[0]) + 1}:00`;
+
+        setInput((prev) => ({
+          ...prev,
+          startTime: timeSlots[start],
+          endTime: endTime,
         }));
       }
+    } else {
+      // รีเซ็ตการเลือกถ้าคลิกใหม่
+      setInput({
+        dueDate: input.dueDate,
+        startTime: slot,
+        endTime: "",
+        selectedField: input.selectedField,
+      });
     }
   };
 
-  // แสดงเวลาที่เลือก
+  // แก้ไขฟังก์ชันเรนเดอร์ตารางเวลา
   const renderTimeSlots = () => {
-    const slotsPerRow = 4; // ปรับเป็น 4 ช่องในแต่ละแถว
+    const slotsPerRow = 4;
     const rows = [];
 
-    // แบ่ง timeSlots ออกเป็นแถวละ slotsPerRow ช่องเวลา
+    // แปลงเวลาเริ่มต้นและสิ้นสุดเป็น index
+    const startIndex = timeSlots.indexOf(input.startTime);
+    const endIndex = timeSlots.indexOf(
+      input.endTime ? `${parseInt(input.endTime.split(":")[0]) - 1}:00` : null
+    );
+
     for (let i = 0; i < timeSlots.length; i += slotsPerRow) {
       rows.push(timeSlots.slice(i, i + slotsPerRow));
     }
 
-    return rows.map(
-      (
-        row,
-        rowIndex // แสดงแถวเวลาในฟอร์ม
-      ) => (
-        <div key={rowIndex} className="flex justify-between mb-2">
-          {row.map((slot, index) => {
-            // แสดงแต่ละช่วงเวลา
-            const isBooked = bookedTimes.some(
-              (time) => slot >= time.startTime && slot < time.endTime // ตรวจสอบว่าเวลานั้นถูกจองหรือไม่
-            );
+    return rows.map((row, rowIndex) => (
+      <div key={rowIndex} className="flex justify-between mb-2">
+        {row.map((slot, index) => {
+          const isBooked = bookedTimes.some(
+            (time) => slot >= time.startTime && slot < time.endTime
+          );
 
-            const isSelected = selectedTimes.some(
-              (time) => time.startTime === slot
-            ); // ตรวจสอบว่าเวลาอยู่ในรายการเลือกแล้วหรือไม่
+          const currentIndex = timeSlots.indexOf(slot);
+          const isInRange =
+            startIndex !== -1 &&
+            endIndex !== -1 &&
+            currentIndex >= Math.min(startIndex, endIndex) &&
+            currentIndex <= Math.max(startIndex, endIndex);
 
-            return (
-              <div
-                key={index}
-                className={`w-1/5 text-center p-2 rounded ${
-                  isBooked
-                    ? "bg-red-200 text-red-700 line-through cursor-not-allowed"
-                    : isSelected
-                    ? "bg-blue-200 text-blue-700 cursor-pointer"
-                    : "bg-green-200 text-green-700 hover:bg-green-300 cursor-pointer"
-                }`}
-                title={
-                  isBooked
-                    ? "เวลานี้ถูกจองแล้ว"
-                    : isSelected
-                    ? "ยกเลิกการเลือก"
-                    : "เลือกเวลา"
-                }
-                onClick={() => !isBooked && handleSelectTime(slot)} // เมื่อคลิกเลือกหรือยกเลิกเวลา
-              >
-                {slot}
-              </div>
-            );
-          })}
-        </div>
-      )
-    );
+          const isFirst = currentIndex === Math.min(startIndex, endIndex);
+          const isLast = currentIndex === Math.max(startIndex, endIndex);
+
+          return (
+            <div
+              key={index}
+              className={`w-1/5 text-center p-2 cursor-pointer transition-all
+              ${
+                isBooked
+                  ? "bg-red-200 text-red-700 line-through cursor-not-allowed"
+                  : isInRange
+                  ? "bg-blue-500 text-white"
+                  : "bg-green-200 hover:bg-green-300"
+              }
+              ${isFirst ? "rounded-l-full" : ""}
+              ${isLast ? "rounded-r-full" : ""}
+              ${isInRange && !isFirst && !isLast ? "rounded-none" : ""}
+            `}
+              onClick={() => handleSelectTime(slot)}
+            >
+              {slot}
+            </div>
+          );
+        })}
+      </div>
+    ));
   };
 
   return (
@@ -370,28 +495,23 @@ export default function UserReserve() {
                 required
               />
             </div>
-            <div className="flex space-x-4 mb-4">
-              <div className="w-1/2">
-                <label className="block text-gray-700">เวลาเริ่มต้น</label>
-                <input
-                  type="time"
-                  name="startTime"
-                  value={input.startTime}
-                  onChange={hdlChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                  required
-                />
-              </div>
-              <div className="w-1/2">
-                <label className="block text-gray-700">เวลาสิ้นสุด</label>
-                <input
-                  type="time"
-                  name="endTime"
-                  value={input.endTime}
-                  onChange={hdlChange}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                  required
-                />
+            <div className="mb-4">
+              <label className="block text-gray-700">ช่วงเวลาที่เลือก</label>
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                {input.startTime && input.endTime ? (
+                  <div className="flex items-center text-green-600">
+                    <span className="mr-2">🕒</span>
+                    {`${input.startTime} - ${input.endTime}`}
+                    <span className="ml-2 text-gray-500">
+                      (ทั้งหมด{" "}
+                      {parseInt(input.endTime.split(":")[0]) -
+                        parseInt(input.startTime.split(":")[0])}{" "}
+                      ชั่วโมง)
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-gray-500">ยังไม่ได้เลือกเวลา</div>
+                )}
               </div>
             </div>
             <div className="mb-4">
@@ -416,17 +536,6 @@ export default function UserReserve() {
                 </p>
               )}
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">หมายเหตุ</label>
-              <input
-                type="text"
-                name="status"
-                value={input.status}
-                onChange={hdlChange}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="กรอกหมายเหตุ (ถ้ามี)"
-              />
-            </div>
           </fieldset>
           <div className="mb-4">
             <label className="block text-gray-700">ราคารวม</label>
@@ -440,18 +549,27 @@ export default function UserReserve() {
         </form>
       </div>
 
-      {/* ปฏิทินและการจองที่มีอยู่แล้ว */}
+      {/* ปฏิทินและตรวจสอบการจอง */}
       <div className="card w-full max-w-md shadow-lg bg-white p-6 rounded-lg">
         <div>
           <h2 className="text-2xl font-bold mb-4">ตรวจสอบการจอง</h2>
           <Calendar
             onChange={(date) => {
-              setCalendarDate(date); // เมื่อเลือกวันที่จากปฏิทิน
-              fetchBookings(dayjs(date).format("YYYY-MM-DD")); // ดึงข้อมูลการจองของวันที่นั้น
+              const formattedDate = dayjs(date).format("YYYY-MM-DD");
+              setCalendarDate(formattedDate); // ✅ กำหนดวันที่ที่เลือกในปฏิทิน
+              setInput((prev) => ({ ...prev, dueDate: formattedDate })); // ✅ อัปเดตใน input date
+              fetchBookings(formattedDate); // ✅ โหลดการจองของวันนั้น
             }}
-            value={calendarDate} // วันที่ในปฏิทิน
-            className="mb-6"
+            value={calendarDate}
+            className="mb-6 p-4 rounded-lg shadow-lg bg-white border border-gray-300"
+            tileClassName={({ date, view }) => {
+              if (dayjs(date).isSame(calendarDate, "day")) {
+                return "bg-blue-500 text-white"; // ✅ เน้นวันที่เลือกด้วยสีฟ้า
+              }
+              return "";
+            }}
           />
+
           <div>
             <h3 className="text-xl font-semibold mb-2">
               การจองในวันที่ {dayjs(calendarDate).format("DD/MM/YYYY")}
