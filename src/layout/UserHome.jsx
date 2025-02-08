@@ -6,7 +6,7 @@ function UserHome() {
       <div className="carousel w-full">
         <div id="slide1" className="carousel-item relative w-full">
           <img
-            src="https://i.postimg.cc/ncMb2tGZ/OT.jpg"
+            src="https://img2.pic.in.th/pic/1ed8eab75948a591f.jpg"
             className="w-full h-96 object-cover"
           />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -20,7 +20,7 @@ function UserHome() {
         </div>
         <div id="slide2" className="carousel-item relative w-full">
           <img
-            src="https://i.postimg.cc/jqH9sFgP/ball.webp"
+            src="https://img2.pic.in.th/pic/475136277_933923578719481_6412863828270291943_n.jpg"
             className="w-full h-96 object-cover"
           />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -34,7 +34,7 @@ function UserHome() {
         </div>
         <div id="slide3" className="carousel-item relative w-full">
           <img
-            src="https://i.postimg.cc/0ykFb0Mj/ball2.jpg"
+            src="https://img2.pic.in.th/pic/472827127_922621583183014_6240810369263582286_n.jpg"
             className="w-full h-96 object-cover"
           />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -48,7 +48,7 @@ function UserHome() {
         </div>
         <div id="slide4" className="carousel-item relative w-full">
           <img
-            src="https://i.postimg.cc/ZYjrJPSV/ball3.webp"
+            src="https://img5.pic.in.th/file/secure-sv1/474903751_933923795386126_961337940690992895_n.jpg"
             className="w-full h-96 object-cover"
           />
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
@@ -67,43 +67,77 @@ function UserHome() {
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="https://i.postimg.cc/NjwtjXYP/Gett.webp"
+                src="https://img2.pic.in.th/pic/474634547_931286312316541_4509436947006918092_n.jpg"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
             </figure>
             <div className="card-body">
               <h2 className="card-title">
-                TEN HAG: MORE YOUNGSTERS CAN BREAK THROUGH
+                เปิดรับสมัคร ทีมเข้าร่วมแข่งขันฟุตบอล 6 คน
               </h2>
-              <p>
-                Erik ten Hag believes there are more youngsters at Manchester
-                United capable of making the breakthrough into the first team.
-                Kobbie Mainoo and Alejandro Garnacho have earned regular places
-                in the line-up of late, providing telling contributions to the
-                cause as the Reds have made a good start to 2024.
+              <p className="text-gray-800 text-lg leading-relaxed">
+                🏆 <strong>แข่งขันวันเสาร์ที่ 15 กุมภาพันธ์ 2568</strong>
+                <br />
+                📌 รับสมัคร <strong>รุ่นอายุ 9 ปี และ 13 ปี</strong> (รับรุ่นละ
+                5 ทีม)
+                <br />
+                💰 <strong>ค่าสมัคร: 1,300 บาท</strong>
+                <br />
+                🆔 <strong>ใช้บัตรประชาชนตัวจริง</strong>
+                <br />
+                📋 ส่งรายชื่อได้ไม่เกิน <strong>15 คน</strong>
+                <br />
+                <br />
+                <a
+                  href="https://www.facebook.com/photo.php?fbid=931286308983208&set=pb.100063055428838.-2207520000&type=3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+                >
+                  📄 รายละเอียดเพิ่มเติม
+                </a>
               </p>
             </div>
           </div>
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="https://i.postimg.cc/7Zs5c4pV/MCTOMINAY.jpg"
+                src="https://img2.pic.in.th/pic/473007151_925731769538662_5798861503805822563_n.jpg"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
             </figure>
             <div className="card-body">
               <h2 className="card-title">
-                TEN HAG: MCTOMINAY IS GIVING THE TEAM A LOT
+                เปิดรับสมัคร ทีมเข้าร่วมแข่งขันฟุตบอล 6 คน
               </h2>
-              <p>
-                The output produced by Manchester United midfielder Scott
-                McTominay is something that is certainly being appreciated by
-                his manager, Erik ten Hag. When it comes to scoring goals, the
-                27-year-old is enjoying the most impactful season of his club
-                career so far, netting a personal-best eight times already in
-                2023/24.
+              <p className="text-gray-800 text-lg leading-relaxed">
+                🏆 <strong>แข่งขันวันอาทิตย์ที่ 29 ธันวาคม 2567</strong>
+                <br />
+                📌 รับสมัคร <strong>
+                  รุ่นอายุ 15 ปี (เกิดปี 2552)
+                </strong> จำนวน <strong>16 ทีม</strong>
+                <br />
+                💰 <strong>ค่าสมัคร: 1,300 บาท</strong>
+                <br />
+                🔒 <strong>ประกันทีม: 400 บาท</strong> (รับคืนหลังจบการแข่งขัน)
+                <br />
+                🆔 <strong>ใช้บัตรประชาชนตัวจริง</strong>
+                <br />
+                📋 ส่งรายชื่อได้ไม่เกิน <strong>15 คน</strong>
+                <br />
+                👕 <strong>เสื้อต้องเป็นสีโทนเดียวกัน</strong>
+                <br />
+                <br />
+                <a
+                  href="https://www.facebook.com/photo.php?fbid=893125056132667&set=pb.100063055428838.-2207520000&type=3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+                >
+                  📄 รายละเอียดเพิ่มเติม
+                </a>
               </p>
             </div>
           </div>
@@ -131,131 +165,25 @@ function UserHome() {
           </div>
         </div>
       </form>
-      <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
-        <li>
-          <div className="timeline-middle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="timeline-start md:text-end mb-10">
-            <time className="font-mono italic">(1878–1945)</time>
-            <div className="text-lg font-black">Early years</div>
-            Manchester United was formed in 1878 as Newton Heath LYR Football
-            Club by the Carriage and Wagon department of the Lancashire and
-            Yorkshire Railway (LYR) depot at Newton Heath. The team initially
-            played games against other departments and railway companies, but on
-            20 November 1880, they competed in their first recorded match;
-            wearing the colours of the railway company – green and gold – they
-            were defeated 6–0 by Bolton Wanderers' reserve team.{" "}
-          </div>
-          <hr />
-        </li>
-        <li>
-          <hr />
-          <div className="timeline-middle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="timeline-end mb-10">
-            <time className="font-mono italic">(1945–1969)</time>
-            <div className="text-lg font-black">Busby years</div>
-            In October 1945, the impending resumption of football after the war
-            led to the managerial appointment of Matt Busby, who demanded an
-            unprecedented level of control over team selection, player transfers
-            and training sessions. Busby led the team to second-place league
-            finishes in 1947, 1948 and 1949, and to FA Cup victory in 1948. In
-            1952, the club won the First Division, its first league title for 41
-            years.{" "}
-          </div>
-          <hr />
-        </li>
-        <li>
-          <hr />
-          <div className="timeline-middle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="timeline-start md:text-end mb-10">
-            <time className="font-mono italic">1969–1986</time>
-            <div className="text-lg font-black">Bryan Robson</div>
-            Following an eighth-place finish in the 1969–70 season and a poor
-            start to the 1970–71 season, Busby was persuaded to temporarily
-            resume managerial duties, and McGuinness returned to his position as
-            reserve team coach. In June 1971, Frank O'Farrell was appointed as
-            manager, but lasted less than 18 months before being replaced by
-            Tommy Docherty in December 1972.{" "}
-          </div>
-          <hr />
-        </li>
-        <li>
-          <hr />
-          <div className="timeline-middle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="timeline-end mb-10">
-            <time className="font-mono italic">(1986–2013)</time>
-            <div className="text-lg font-black">Ferguson years</div>
-            Alex Ferguson and his assistant Archie Knox arrived from Aberdeen on
-            the day of Atkinson's dismissal, and guided the club to an
-            11th-place finish in the league. Despite a second-place finish in
-            1987–88, the club was back in 11th place the following season.
-            Reportedly on the verge of being dismissed, Ferguson's job was saved
-            by victory over Crystal Palace in the 1990 FA Cup final. The
-            following season, Manchester United claimed their first UEFA Cup
-            Winners' Cup title.{" "}
-          </div>
-          <hr />
-        </li>
-      </ul>
+
       <div className="diff aspect-[16/9]">
-        <img alt="daisy" src="https://i.postimg.cc/rsFJJQSY/hojlund.webp" />
+        <img
+          alt="daisy"
+          src="https://img2.pic.in.th/pic/472909631_922610796517426_6342143861772370129_n.jpg"
+        />
       </div>
       <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded">
         <nav className="grid grid-flow-col gap-4">
-          <a className="link link-hover">เกี่ยวกับเรา</a>
-          <a className="link link-hover">ติดต่อ</a>
+          <a
+            href="https://www.facebook.com/profile.php?id=100063055428838"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link link-hover text-blue-500 hover:underline"
+          >
+            ติดต่อ
+          </a>
         </nav>
+
         <nav>
           <div className="grid grid-flow-col gap-4">
             <a>

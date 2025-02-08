@@ -40,7 +40,6 @@ export default function UserReserve() {
     "20:00",
     "21:00",
     "22:00",
-    "23:00",
   ];
 
   // แก้ไข State
@@ -421,7 +420,7 @@ export default function UserReserve() {
 
   // แก้ไขฟังก์ชันเรนเดอร์ตารางเวลา
   const renderTimeSlots = () => {
-    const slotsPerRow = 4;
+    const slotsPerRow = 5;
     const rows = [];
 
     // แปลงเวลาเริ่มต้นและสิ้นสุดเป็น index
