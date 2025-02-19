@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
-import Swal from "sweetalert2"; // ใช้ SweetAlert สำหรับแสดงข้อความแจ้งเตือน
-import { useNavigate } from "react-router-dom"; // ใช้ useNavigate สำหรับการเปลี่ยนเส้นทาง
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
   const [input, setInput] = useState({
@@ -10,41 +10,88 @@ export default function RegisterForm() {
     confirmPassword: "",
     email: "",
   });
+
+  const [loading, setLoading] = useState(false); // เพิ่ม state สำหรับปุ่ม
   const navigate = useNavigate();
-  // ฟังก์ชันสำหรับการเปลี่ยนแปลงข้อมูลใน form
+
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงของ input
   const hdlChange = (e) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ฟังก์ชันสำหรับการส่งข้อมูลหลังจากการกรอกฟอร์ม
+  // ฟังก์ชันส่งข้อมูลสมัครสมาชิก
   const hdlSubmit = async (e) => {
+    e.preventDefault();
+
+    // ✅ ตรวจสอบข้อมูลที่ว่าง
+    if (!input.username || !input.password || !input.confirmPassword || !input.email) {
+      return Swal.fire({
+        title: "เกิดข้อผิดพลาด!",
+        text: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        icon: "warning",
+      });
+    }
+
+    // ✅ ตรวจสอบรหัสผ่านและยืนยันรหัสผ่าน
+    if (input.password !== input.confirmPassword) {
+      return Swal.fire({
+        title: "เกิดข้อผิดพลาด!",
+        text: "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน",
+        icon: "error",
+      });
+    }
+
     try {
-      e.preventDefault();
-      // ตรวจสอบความตรงกันระหว่างรหัสผ่านและยืนยันรหัสผ่าน
-      if (input.password !== input.confirmPassword) {
-        return alert("Please check confirm password");
-      }
-      // ส่งข้อมูลลงทะเบียนไปยัง API
-      const rs = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
-        input
-      );
-      console.log(rs);
-      if (rs.status === 200) {
-        // แสดงข้อความสำเร็จเมื่อสมัครเสร็จ
+      setLoading(true); // เปิดสถานะโหลด
+
+      // ✅ ส่งข้อมูลไปยัง API
+      const rs = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, input);
+
+      if (rs.status === 201) {
         Swal.fire({
-          title: "Good job!",
-          text: "Register Successful",
+          title: "สมัครสมาชิกสำเร็จ!",
+          text: "คุณสามารถเข้าสู่ระบบได้ทันที",
           icon: "success",
         }).then(() => {
-          // ใช้ setTimeout เพื่อเพิ่มดีเลย์ 2 วินาที ก่อนที่จะเปลี่ยนเส้นทาง
           setTimeout(() => {
-            navigate("/login"); // เปลี่ยนเส้นทางไปยังหน้าล็อกอิน
-          }, 2000); // ดีเลย์ 2 วินาที
+            navigate("/login");
+          }, 2000);
         });
       }
     } catch (err) {
-      console.log(err.message);
+      console.error("Error:", err.response?.data || err.message);
+
+      if (err.response) {
+        const { status, data } = err.response;
+
+        if (status === 400) {
+          Swal.fire({
+            title: "ข้อผิดพลาด!",
+            text: data.message || "ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้ไปแล้ว",
+            icon: "error",
+          });
+        } else if (status === 500) {
+          Swal.fire({
+            title: "เซิร์ฟเวอร์ขัดข้อง!",
+            text: "โปรดลองใหม่ภายหลัง",
+            icon: "error",
+          });
+        } else {
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: "กรุณาลองใหม่ภายหลัง",
+            icon: "error",
+          });
+        }
+      } else {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
+          icon: "error",
+        });
+      }
+    } finally {
+      setLoading(false); // ปิดสถานะโหลด
     }
   };
 
@@ -106,8 +153,8 @@ export default function RegisterForm() {
             />
           </div>
           <div className="flex justify-center">
-            <button type="submit" className="btn btn-success w-full">
-              ยืนยัน
+            <button type="submit" className={`btn btn-success w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
+              {loading ? "กำลังสมัครสมาชิก..." : "ยืนยัน"}
             </button>
           </div>
         </form>

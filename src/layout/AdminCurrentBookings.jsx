@@ -213,93 +213,7 @@ export default function AdminCurrentBookings() {
   };
 
   // ฟังก์ชันเปิดฟอร์มการเพิ่มการจอง
-  const handleAddBookingOpen = () => {
-    setIsAddBookingOpen(true);
-    resetForm();
-    setEditingBooking(null);
-    fetchBookingsByDate(dayjs().format("YYYY-MM-DD"));
-  };
 
-  // ฟังก์ชันส่งข้อมูลการจองเมื่อเพิ่มการจอง
-  const handleAddBookingSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const output = {
-        startTime: dayjs(`${formData.dueDate}T${formData.startTime}`),
-        endTime: dayjs(`${formData.dueDate}T${formData.endTime}`),
-        dueDate: dayjs(`${formData.dueDate}T${formData.startTime}`),
-        totalCost: calculateTotalCost(),
-        fieldId: parseInt(formData.selectedField),
-        userId: formData.userId ? parseInt(formData.userId) : null,
-      };
-
-      // ตรวจสอบการจองซ้ำ
-      const isDuplicate = await checkDuplicateBooking(output);
-
-      if (isDuplicate) {
-        Swal.fire({
-          title: "Error",
-          text: "มีการจองในช่วงเวลาดังกล่าวอยู่แล้ว",
-          icon: "error",
-          confirmButtonText: "ตกลง",
-          confirmButtonColor: "#d9534f", // เปลี่ยนสีปุ่ม "ตกลง" เป็นสีแดง
-          iconColor: "#d9534f", // เปลี่ยนสีของไอคอนเป็นสีแดง
-          background: "#f8d7da", // สีพื้นหลังของ Swal
-          showCloseButton: true, // เพิ่มปุ่มปิด
-        }).then(() => {
-          setTimeout(() => {
-            navigate("/admin/manage/bookingfield");
-          }, 2000);
-        });
-        return;
-      }
-
-      // ส่งข้อมูลการจองไปยัง API
-      const rs = await axios.post(
-        `${import.meta.env.VITE_API_URL}/booking/bookings/create/${
-          output.userId
-        }`,
-        output
-      );
-
-      if (rs.status === 200) {
-        setBookings((prev) => [...prev, rs.data]);
-        Swal.fire({
-          title: "Success",
-          text: `กรุณาบันทึกหน้าจอ \nวันที่จอง: ${
-            formData.dueDate
-          }\nเวลาเริ่มต้น: ${formData.startTime}\nเวลาสิ้นสุด: ${
-            formData.endTime
-          }\nราคาต่อชั่วโมง: ${selectedFieldPrice} บาท\nราคารวม: ${calculateTotalCost()} บาท`,
-          icon: "success",
-          confirmButtonText: "เรียบร้อย",
-          confirmButtonColor: "#28a745", // สีปุ่ม "เรียบร้อย" เป็นสีเขียว
-          iconColor: "#28a745", // เปลี่ยนสีไอคอนให้เป็นสีเขียว
-          background: "#d4edda", // เปลี่ยนพื้นหลังเป็นสีเขียวอ่อน
-        }).then(() => {
-          window.location.reload();
-        });
-        setIsAddBookingOpen(false);
-        resetForm();
-      } else {
-        throw new Error("Failed to create new.");
-      }
-    } catch (err) {
-      Swal.fire({
-        title: "Error",
-        text: err.message,
-        icon: "error",
-        confirmButtonText: "ตกลง",
-        confirmButtonColor: "#dc3545", // เปลี่ยนสีปุ่ม "ตกลง" เป็นสีแดง
-        iconColor: "#dc3545", // เปลี่ยนสีของไอคอนให้เป็นสีแดง
-        background: "#f8d7da", // เปลี่ยนพื้นหลังเป็นสีแดงอ่อน
-      }).then(() => {
-        setTimeout(() => {
-          navigate("/admin/manage/bookingfield");
-        }, 2000);
-      });
-    }
-  };
 
   // ฟังก์ชันแก้ไขการจอง
   const handleEditBookingSubmit = async (e) => {
@@ -338,7 +252,7 @@ export default function AdminCurrentBookings() {
         background: "#d4edda", // ปรับพื้นหลังให้เป็นสีเขียวอ่อน
       }).then(() => {
         setTimeout(() => {
-          navigate("/admin/manage/bookingfield");
+          navigate("/admin/current-bookings");
         }, 1000);
       });
     } catch (error) {
@@ -651,11 +565,7 @@ export default function AdminCurrentBookings() {
           <p className="text-gray-600 mt-2">จัดการการจองที่กำลังดำเนินการ</p>
         </div>
 
-        <div className="mb-6">
-          <button className="btn btn-primary" onClick={handleAddBookingOpen}>
-            เพิ่มการจองใหม่
-          </button>
-        </div>
+
 
         {/* ตารางการจอง */}
         {loading ? (
@@ -714,17 +624,17 @@ export default function AdminCurrentBookings() {
                       <td>{totalCost.toFixed(2)} บาท</td>
                       <td>{booking.status}</td>
                       <td>
+                      <button
+                          className="btn btn-info btn-sm mr-2"
+                          onClick={() => handleShowSlip(booking)}
+                        >
+                          ดูสลิป
+                        </button>
                         <button
                           className="btn btn-warning btn-sm mr-2"
                           onClick={() => handleEditClick(booking)}
                         >
                           แก้ไข
-                        </button>
-                        <button
-                          className="btn btn-error btn-sm mr-2"
-                          onClick={() => handleDeleteClick(booking)}
-                        >
-                          ลบ
                         </button>
                         {booking.status !== "Cancel" &&
                           booking.status !== "Completed" && (
@@ -759,143 +669,6 @@ export default function AdminCurrentBookings() {
                 })}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {/* โมดอลสำหรับเพิ่มการจองใหม่ */}
-        {isAddBookingOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-3xl">
-              <h2 className="text-xl font-semibold mb-4">เพิ่มการจอง</h2>
-              <form onSubmit={handleAddBookingSubmit}>
-                <div className="flex flex-col md:flex-row">
-                  <div className="md:w-1/2 md:pr-4">
-                    <label className="block text-gray-700">วันที่จอง</label>
-                    <input
-                      type="date"
-                      name="dueDate"
-                      value={formData.dueDate}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md mb-4"
-                      required
-                    />
-
-                    <div className="mb-4">
-                      <label className="block text-gray-700">
-                        ช่วงเวลาที่เลือก
-                      </label>
-                      <div className="mt-2 p-3 bg-gray-50 rounded-md">
-                        {formData.startTime && formData.endTime ? (
-                          <div className="flex items-center text-green-600">
-                            <span className="mr-2">🕒</span>
-                            {`${formData.startTime} - ${formData.endTime}`}
-                            <span className="ml-2 text-gray-500">
-                              (ทั้งหมด{" "}
-                              {parseInt(formData.endTime.split(":")[0]) -
-                                parseInt(formData.startTime.split(":")[0])}{" "}
-                              ชั่วโมง)
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="text-gray-500">
-                            คลิกเลือกเวลาเริ่มต้นและสิ้นสุด
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <label className="block text-gray-700">เลือกสนาม</label>
-                    <select
-                      name="selectedField"
-                      value={formData.selectedField}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md mb-4"
-                      required
-                    >
-                      <option value="">เลือกสนาม</option>
-                      {fields.map((field) => (
-                        <option key={field.id} value={field.id}>
-                          {field.name}
-                        </option>
-                      ))}
-                    </select>
-                    {selectedFieldPrice > 0 && (
-                      <p className="mb-4 text-sm text-gray-600">
-                        ราคาต่อชั่วโมง: {selectedFieldPrice} บาท
-                      </p>
-                    )}
-                    <label className="block text-gray-700">เลือกผู้ใช้</label>
-                    <select
-                      name="userId"
-                      value={formData.userId}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border rounded-md mb-4"
-                      required
-                    >
-                      <option value="">เลือกผู้ใช้</option>
-                      {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.username}
-                        </option>
-                      ))}
-                    </select>
-                    <label className="block text-gray-700">หมายเหตุ</label>
-                    <div className="mb-4">
-                      <label className="block text-gray-700">ราคารวม</label>
-                      <p className="text-lg font-semibold">
-                        {calculateTotalCost()} บาท
-                      </p>
-                    </div>
-                  </div>
-                  <div className="md:w-1/2 md:pl-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      ตรวจสอบการจอง
-                    </h3>
-                    <Calendar
-                      onChange={(date) => {
-                        setCalendarDate(date);
-                        setFormData((prev) => ({
-                          ...prev,
-                          dueDate: dayjs(date).format("YYYY-MM-DD"),
-                        }));
-                        fetchBookingsByDate(dayjs(date).format("YYYY-MM-DD"));
-                      }}
-                      value={calendarDate}
-                      tileClassName={({ date, view }) => {
-                        // เพิ่มสีให้กับวันที่ถูกเลือก
-                        if (dayjs(date).isSame(calendarDate, "day")) {
-                          return "bg-blue-500 text-white"; // สีพื้นหลังฟ้าและข้อความขาว
-                        }
-                        return ""; // หากไม่ได้เลือกวันใดๆ ก็จะไม่เพิ่มคลาส
-                      }}
-                      className="mb-6 p-4 rounded-lg shadow-lg bg-white border border-gray-300" // ใช้ TailwindCSS ในการตกแต่ง
-                    />
-
-                    <div>
-                      <h4 className="text-md font-medium mb-2">
-                        การจองในวันที่{" "}
-                        {dayjs(calendarDate).format("DD/MM/YYYY")}
-                      </h4>
-                      <div>
-                        <h5 className="text-sm font-medium">เวลาที่ว่าง:</h5>
-                        <div className="mt-2">{renderTimeSlots()}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-end mt-4">
-                  <button type="submit" className="btn btn-primary mr-2">
-                    เพิ่ม
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setIsAddBookingOpen(false)}
-                  >
-                    ยกเลิก
-                  </button>
-                </div>
-              </form>
-            </div>
           </div>
         )}
 

@@ -144,22 +144,50 @@ function UserHome() {
           <div className="card w-96 bg-base-100 shadow-xl m-5">
             <figure>
               <img
-                src="https://i.postimg.cc/X7xM4zHX/Getty.webp"
+                src="https://img2.pic.in.th/pic/476630960_942209047890934_3680541933590975869_n.jpg"
                 alt="Shoes"
                 className="w-full h-72 object-cover"
               />
             </figure>
             <div className="card-body">
               <h2 className="card-title">
-                TEN HAG: WE HAVE TO GIVE THEM TIME TO DEVELOP
+                เปิดรับสมัคร ทีมเข้าร่วมแข่งขันฟุตบอล 6 คน
               </h2>
-              <p>
-                Manchester United boss Erik ten Hag believes showing faith in
-                our young players remains integral in adhering to the club's
-                long-lasting DNA principles. Kobbie Mainoo, Rasmus Hojlund and
-                Alejandro Garnacho have continued to shine for the Reds, who
-                have won five of our six outings in all competitions at the
-                start of 2024.
+              <p className="bg-gray-100 p-4 rounded-lg shadow-md text-gray-800">
+                🏆 <strong>แข่งขันวันอาทิตย์ 15 กุมภาพันธ์ 2568</strong> <br />
+                📌 รับสมัคร:
+                <ul className="list-disc list-inside ml-4">
+                  <li>
+                    <strong>รุ่นอายุ 13 ปี</strong> (2555) รับ 8 ทีม
+                  </li>
+                  <li>
+                    <strong>รุ่นอายุ 15 ปี</strong> (2553) รับ 8 ทีม
+                  </li>
+                </ul>
+                <br />
+                💰 <strong>ค่าสมัคร:</strong> 1,200 บาท <br />
+                ❌ ไม่มีประกันทีม
+                <hr className="my-2" />✅ <strong>กติกา:</strong>
+                <ul className="list-disc list-inside ml-4">
+                  <li>
+                    ต้องใช้ <strong>บัตรประชาชนตัวจริง</strong>
+                  </li>
+                  <li>
+                    ส่งรายชื่อได้ <strong>ไม่เกิน 15 คน</strong>
+                  </li>
+                  <li>
+                    เสื้อต้องเป็น <strong>สีโทนเดียวกัน</strong>
+                  </li>
+                </ul>
+                <br />
+                <a
+                  href="https://www.facebook.com/photo?fbid=942209044557601&set=a.333570255421486"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+                >
+                  📄 รายละเอียดเพิ่มเติม
+                </a>
               </p>
             </div>
           </div>

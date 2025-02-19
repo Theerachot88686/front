@@ -1,23 +1,30 @@
 // ManageUser.jsx
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Swal from "sweetalert2";
 
 export default function ManageUser() {
   const [users, setUsers] = useState([]); // สถานะสำหรับเก็บข้อมูลผู้ใช้
   const [loading, setLoading] = useState(true); // สถานะสำหรับการโหลดข้อมูล
   const [editingUser, setEditingUser] = useState(null); // สถานะสำหรับเก็บข้อมูลผู้ใช้ที่กำลังแก้ไข
-  const [formData, setFormData] = useState({ username: '', password: '', email: '', role: '' }); // สถานะสำหรับเก็บข้อมูลในฟอร์ม
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    email: "",
+    role: "",
+  }); // สถานะสำหรับเก็บข้อมูลในฟอร์ม
 
   useEffect(() => {
     // ดึงข้อมูลจาก API เมื่อ component โหลดเสร็จ
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/get/pull`);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/get/pull`
+        );
         setUsers(response.data); // เก็บข้อมูลที่ได้จาก API
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error("Error fetching users:", error);
       } finally {
         setLoading(false);
       }
@@ -31,9 +38,9 @@ export default function ManageUser() {
     setEditingUser(user);
     setFormData({
       username: user.username,
-      password: user.password || '',
-      email: user.email || '',
-      role: user.role || '',
+      password: user.password || "",
+      email: user.email || "",
+      role: user.role || "",
     });
   };
 
@@ -52,7 +59,7 @@ export default function ManageUser() {
     try {
       await axios.put(
         `${import.meta.env.VITE_API_URL}/auth/update/${editingUser.id}`,
-        formData,
+        formData
       );
       // อัปเดตข้อมูลผู้ใช้ใน state
       setUsers((prevUsers) =>
@@ -67,13 +74,14 @@ export default function ManageUser() {
         icon: "success",
         confirmButtonText: "ตกลง",
         confirmButtonColor: "#28a745", // สีเขียวสำหรับปุ่ม
-        iconColor: "#28a745",  // สีไอคอนเป็นสีเขียว
+        iconColor: "#28a745", // สีไอคอนเป็นสีเขียว
         background: "#d4edda", // พื้นหลังสีเขียวอ่อน
       });
     } catch (error) {
       console.error("Error updating user:", error);
       const errorMessage =
-        error.response?.data?.message || "There was an error while updating the user.";
+        error.response?.data?.message ||
+        "There was an error while updating the user.";
       Swal.fire({
         title: "Error!",
         text: errorMessage,
@@ -85,7 +93,6 @@ export default function ManageUser() {
       });
     }
   };
-  
 
   // ฟังก์ชันสำหรับลบผู้ใช้
   const handleDeleteClick = async (user) => {
@@ -104,10 +111,22 @@ export default function ManageUser() {
             `${import.meta.env.VITE_API_URL}/auth/delete/user/${user.id}`
           );
           setUsers((prevUsers) => prevUsers.filter((u) => u.id !== user.id));
-          Swal.fire("Deleted!", `${user.username} has been deleted.`, "success");
+          Swal.fire({
+            title: "Deleted!",
+            text: `${user.username} has been deleted.`,
+            icon: "success",
+            background: "#e8f5e9", // สีพื้นหลังเขียวอ่อน
+            color: "#2e7d32", // สีตัวหนังสือเขียวเข้ม
+            confirmButtonColor: "#388e3c", // สีปุ่มยืนยัน
+          });
+          
         } catch (error) {
-          console.error('Error deleting user:', error);
-          Swal.fire("Error!", "There was an error while deleting the user.", "error");
+          console.error("Error deleting user:", error);
+          Swal.fire(
+            "Error!",
+            "There was an error while deleting the user.",
+            "error"
+          );
         }
       }
     });
@@ -163,9 +182,18 @@ export default function ManageUser() {
                     <td>{user.role}</td>
                     <td>
                       {user.lastLoginAt
-                        ? new Date(user.lastLoginAt).toLocaleString()
-                        : 'Never'}
+                        ? new Date(user.lastLoginAt).toLocaleString("en-GB", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false, // ปิด AM/PM
+                          })
+                        : "Never"}
                     </td>
+
                     <td>
                       <button
                         className="btn btn-warning btn-sm mr-2"

@@ -36,7 +36,7 @@ export default function Field() {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: name === "pricePerHour" ? Number(value) : value,
     }));
   };
 
@@ -47,15 +47,21 @@ export default function Field() {
         `${import.meta.env.VITE_API_URL}/field/${editingField.id}`,
         formData
       );
-      setFields((prevFields) =>
-        prevFields.map((field) =>
+      console.log("API Response:", response.data);
+      setFields((prevFields) => {
+        const updatedFields = prevFields.map((field) =>
           field.id === editingField.id ? { ...field, ...formData } : field
-        )
-      );
+        );
+        console.log("Updated Fields:", updatedFields);
+        return updatedFields;
+      });
       Swal.fire({
         icon: "success",
         title: "Field Updated",
         text: "The field has been updated successfully!",
+        background: "#e0f7fa", // สีพื้นหลังฟ้าอ่อน
+        color: "#00796b", // สีตัวหนังสือเขียวเข้ม
+        confirmButtonColor: "#00796b", // สีปุ่ม
       });
       setEditingField(null); // ยกเลิกการแก้ไข
       setFormData({ name: "", location: "", pricePerHour: 0 }); // เคลียร์ฟอร์ม
@@ -64,6 +70,9 @@ export default function Field() {
         icon: "error",
         title: "Update Failed",
         text: "There was an error updating the field.",
+        background: "#ffebee", // สีพื้นหลังแดงอ่อน
+        color: "#c62828", // สีตัวหนังสือแดงเข้ม
+        confirmButtonColor: "#d32f2f", // สีปุ่มแดง
       });
       console.error("Error updating field:", error);
     }
@@ -102,6 +111,9 @@ export default function Field() {
           icon: "success",
           title: "Field Deleted",
           text: "The field has been deleted successfully.",
+          background: "#e0f7fa", // สีพื้นหลังฟ้าอ่อน
+          color: "#00796b", // สีตัวหนังสือเขียวเข้ม
+          confirmButtonColor: "#00796b", // สีปุ่ม
         });
       }
     } catch (error) {
@@ -109,6 +121,9 @@ export default function Field() {
         icon: "error",
         title: "Delete Failed",
         text: "There was an error deleting the field.",
+        background: "#ffebee", // สีพื้นหลังแดงอ่อน
+        color: "#c62828", // สีตัวหนังสือแดงเข้ม
+        confirmButtonColor: "#d32f2f", // สีปุ่มแดง
       });
       console.error("Error deleting field:", error);
     }
@@ -128,12 +143,18 @@ export default function Field() {
         icon: "success",
         title: "Field Added",
         text: "The new field has been added successfully!",
+        background: "#e0f7fa", // สีพื้นหลังฟ้าอ่อน
+        color: "#00796b", // สีตัวหนังสือเขียวเข้ม
+        confirmButtonColor: "#00796b", // สีปุ่ม
       });
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Add Failed",
         text: "There was an error adding the field.",
+        background: "#ffebee", // สีพื้นหลังแดงอ่อน
+        color: "#c62828", // สีตัวหนังสือแดงเข้ม
+        confirmButtonColor: "#d32f2f", // สีปุ่มแดง
       });
       console.error("Error adding field:", error);
     }

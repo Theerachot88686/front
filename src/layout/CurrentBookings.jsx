@@ -55,11 +55,17 @@ function CurrentBookings() {
         await axios.put(`${import.meta.env.VITE_API_URL}/booking/bookings/${bookingId}/cancel`);
         setBookings(prev => prev.filter(b => b.id !== bookingId));
         
-        Swal.fire(
-          'ยกเลิกแล้ว!',
-          'การจองของคุณถูกยกเลิกเรียบร้อย',
-          'success'
-        );
+        Swal.fire({
+          title: "ยกเลิกแล้ว!",
+          text: "การจองของคุณถูกยกเลิกเรียบร้อย",
+          icon: "success",
+          iconColor: "#28a745", // ไอคอนสีเขียว
+          background: "#d4edda", // พื้นหลังสีเขียวอ่อน
+          color: "#155724", // ข้อความสีเขียวเข้ม
+          confirmButtonColor: "#28a745", // ปุ่มสีเขียว
+          confirmButtonText: "ตกลง",
+        });
+        
       }
     } catch (error) {
       console.error("Cancel error:", error);
