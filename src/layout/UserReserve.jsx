@@ -369,7 +369,9 @@ export default function UserReserve() {
     const slotsPerRow = 5;
     const rows = [];
 
-    // แปลงเวลาเริ่มต้นและสิ้นสุดเป็น index
+    const now = dayjs();
+    const currentTime = now.format("HH:mm"); // ✅ เวลาปัจจุบัน เช่น "20:30"
+
     const startIndex = timeSlots.indexOf(input.startTime);
     const endIndex = timeSlots.indexOf(
       input.endTime ? `${parseInt(input.endTime.split(":")[0]) - 1}:00` : null
@@ -381,10 +383,13 @@ export default function UserReserve() {
 
     return rows.map((row, rowIndex) => (
       <div key={rowIndex} className="flex justify-between mb-2">
-        {row.map((slot, index) => {
+        {row.map((slot) => {
           const isBooked = bookedTimes.some(
             (time) => slot >= time.startTime && slot < time.endTime
           );
+
+          const isPastTime =
+            dayjs(calendarDate).isSame(now, "day") && slot <= currentTime; // ✅ เช็คเวลาทั้ง ชม. และ นาที
 
           const currentIndex = timeSlots.indexOf(slot);
           const isInRange =
@@ -401,20 +406,25 @@ export default function UserReserve() {
               key={slot}
               className={`flex-1 text-center p-3 cursor-pointer transition-all duration-300 ease-in-out rounded-lg shadow-md mx-1
                 ${
+                  isPastTime
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : ""
+                }
+                ${
                   isBooked
                     ? "bg-red-500 text-white line-through cursor-not-allowed"
                     : ""
                 }
                 ${isInRange ? "bg-blue-600 text-white shadow-lg scale-105" : ""}
                 ${
-                  !isBooked && !isInRange
+                  !isBooked && !isInRange && !isPastTime
                     ? "bg-green-400 text-black hover:bg-green-500 active:scale-95"
                     : ""
                 }
                 ${isFirst ? "rounded-l-full" : ""}
                 ${isLast ? "rounded-r-full" : ""}
               `}
-              onClick={() => !isBooked && handleSelectTime(slot)}
+              onClick={() => !isBooked && !isPastTime && handleSelectTime(slot)}
             >
               {slot}
             </div>
@@ -513,6 +523,7 @@ export default function UserReserve() {
               fetchBookings(formattedDate); // ✅ โหลดการจองของวันนั้น
             }}
             value={calendarDate}
+            minDate={new Date()} // ✅ ป้องกันการเลือกวันย้อนหลัง
             className="mb-6 p-4 rounded-lg shadow-lg bg-white border border-gray-300"
             tileClassName={({ date, view }) => {
               if (dayjs(date).isSame(calendarDate, "day")) {

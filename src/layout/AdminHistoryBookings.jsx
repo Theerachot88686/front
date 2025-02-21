@@ -100,7 +100,7 @@ export default function AdminHistoryBookings() {
 
     const handleDeleteClick = async (booking) => {
       Swal.fire({
-        title: `แน่ใจว่าต้องการลบ ${booking.field.name}?`,
+        title: `แน่ใจว่าต้องการลบ ${booking.user.username}?`,
         text: "This action cannot be undone.",
         icon: "warning",
         showCancelButton: true,

@@ -73,7 +73,7 @@ function CurrentBookings() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6 text-green-600">การจองปัจจุบัน</h1>
+      <h1 className="text-2xl font-bold mb-6 text-green-600">สถานะการจอง</h1>
       <div className="overflow-x-auto">
         <table className="table table-zebra w-full">
           <thead>

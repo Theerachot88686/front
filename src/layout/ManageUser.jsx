@@ -1,29 +1,28 @@
-// ManageUser.jsx
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 export default function ManageUser() {
-  const [users, setUsers] = useState([]); // สถานะสำหรับเก็บข้อมูลผู้ใช้
-  const [loading, setLoading] = useState(true); // สถานะสำหรับการโหลดข้อมูล
-  const [editingUser, setEditingUser] = useState(null); // สถานะสำหรับเก็บข้อมูลผู้ใช้ที่กำลังแก้ไข
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     email: "",
     role: "",
-  }); // สถานะสำหรับเก็บข้อมูลในฟอร์ม
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [highlightedUserId, setHighlightedUserId] = useState(null);
+  const userRefs = useRef({});
 
   useEffect(() => {
-    // ดึงข้อมูลจาก API เมื่อ component โหลดเสร็จ
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/get/pull`
         );
-        setUsers(response.data); // เก็บข้อมูลที่ได้จาก API
-       
+        setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
@@ -31,71 +30,18 @@ export default function ManageUser() {
       }
     };
     fetchUsers();
-    
   }, []);
 
-  // ฟังก์ชันสำหรับแก้ไขข้อมูลผู้ใช้
   const handleEditClick = (user) => {
     setEditingUser(user);
     setFormData({
       username: user.username,
-      password: user.password || "",
+      password: "",
       email: user.email || "",
       role: user.role || "",
     });
   };
 
-  // ฟังก์ชันสำหรับเปลี่ยนแปลงค่าฟอร์ม
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // ฟังก์ชันสำหรับส่งข้อมูลไปยัง API (อัปเดตข้อมูลผู้ใช้)
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/auth/update/${editingUser.id}`,
-        formData
-      );
-      // อัปเดตข้อมูลผู้ใช้ใน state
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id === editingUser.id ? { ...user, ...formData } : user
-        )
-      );
-      setEditingUser(null);
-      Swal.fire({
-        title: "Updated!",
-        text: "User details have been updated.",
-        icon: "success",
-        confirmButtonText: "ตกลง",
-        confirmButtonColor: "#28a745", // สีเขียวสำหรับปุ่ม
-        iconColor: "#28a745", // สีไอคอนเป็นสีเขียว
-        background: "#d4edda", // พื้นหลังสีเขียวอ่อน
-      });
-    } catch (error) {
-      console.error("Error updating user:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "There was an error while updating the user.";
-      Swal.fire({
-        title: "Error!",
-        text: errorMessage,
-        icon: "error",
-        confirmButtonText: "ตกลง",
-        confirmButtonColor: "#dc3545", // ปุ่มยืนยันสีแดง
-        iconColor: "#dc3545", // สีไอคอนเป็นสีแดง
-        background: "#f8d7da", // พื้นหลังสีแดงอ่อน
-      });
-    }
-  };
-
-  // ฟังก์ชันสำหรับลบผู้ใช้
   const handleDeleteClick = async (user) => {
     Swal.fire({
       title: `Are you sure you want to delete ${user.username}?`,
@@ -112,15 +58,11 @@ export default function ManageUser() {
             `${import.meta.env.VITE_API_URL}/auth/delete/user/${user.id}`
           );
           setUsers((prevUsers) => prevUsers.filter((u) => u.id !== user.id));
-          Swal.fire({
-            title: "Deleted!",
-            text: `${user.username} has been deleted.`,
-            icon: "success",
-            background: "#e8f5e9", // สีพื้นหลังเขียวอ่อน
-            color: "#2e7d32", // สีตัวหนังสือเขียวเข้ม
-            confirmButtonColor: "#388e3c", // สีปุ่มยืนยัน
-          });
-          
+          Swal.fire(
+            "Deleted!",
+            `${user.username} has been deleted.`,
+            "success"
+          );
         } catch (error) {
           console.error("Error deleting user:", error);
           Swal.fire(
@@ -133,38 +75,75 @@ export default function ManageUser() {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/auth/update/${editingUser.id}`,
+        formData
+      );
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === editingUser.id ? { ...user, ...formData } : user
+        )
+      );
+      setEditingUser(null);
+      Swal.fire("Updated!", "User details have been updated.", "success");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      Swal.fire(
+        "Error!",
+        "There was an error while updating the user.",
+        "error"
+      );
+    }
+  };
+
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (searchTerm) {
+      const firstMatch = filteredUsers[0];
+      if (firstMatch) {
+        setHighlightedUserId(firstMatch.id);
+        userRefs.current[firstMatch.id]?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    } else {
+      setHighlightedUserId(null);
+    }
+  }, [searchTerm, filteredUsers]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-semibold text-gray-900">Manage Users</h1>
-          <p className="text-gray-600 mt-2">
-            View, edit, and manage all registered users in your system
-          </p>
-        </div>
+        <h1 className="text-4xl font-semibold text-gray-900 text-center mb-8">
+          Manage Users
+        </h1>
 
-        {/* Search and Add User Section */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="form-control w-full max-w-xs">
-            <label className="label">
-              <span className="label-text">Search Users</span>
-            </label>
+        <div className="relative w-full max-w-xs mb-4">
+          <div className="relative">
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
+              🔍
+            </span>
             <input
               type="text"
-              placeholder="Search by username"
-              className="input input-bordered w-full"
+              placeholder="พิมพ์ชื่อผู้ใช้..."
+              className="input input-bordered w-full pl-10 pr-3 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
-        {/* Users Table */}
         {loading ? (
-          <div className="flex justify-center mt-6">
-            <div className="loader">Loading...</div>
-          </div>
+          <div className="flex justify-center mt-6">Loading...</div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="flex justify-center">
             <table className="table table-zebra w-full">
               <thead>
                 <tr>
@@ -176,21 +155,27 @@ export default function ManageUser() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
+                {filteredUsers.map((user) => (
+                  <tr
+                    key={user.id}
+                    ref={(el) => (userRefs.current[user.id] = el)}
+                    className={
+                      highlightedUserId === user.id ? "bg-yellow-200" : ""
+                    }
+                  >
                     <td>{user.username}</td>
                     <td>{user.email}</td>
                     <td>{user.role}</td>
                     <td>
                       {user.lastLoginAt
-                        ? new Date(user.lastLoginAt).toLocaleString("en-GB", {
+                        ? new Date(user.lastLoginAt).toLocaleString("th-TH", {
                             year: "numeric",
                             month: "2-digit",
                             day: "2-digit",
                             hour: "2-digit",
                             minute: "2-digit",
                             second: "2-digit",
-                            hour12: false, // ปิด AM/PM
+                            hour12: false, // ใช้ 24 ชั่วโมง
                           })
                         : "Never"}
                     </td>
@@ -216,7 +201,6 @@ export default function ManageUser() {
           </div>
         )}
 
-        {/* Edit Form Modal */}
         {editingUser && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-xl shadow-xl w-1/3">
@@ -228,19 +212,22 @@ export default function ManageUser() {
                     type="text"
                     name="username"
                     value={formData.username}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, username: e.target.value })
+                    }
                     className="input input-bordered w-full"
                     required
                   />
                 </div>
-
                 <div className="mb-4">
                   <label className="label">Email</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="input input-bordered w-full"
                   />
                 </div>

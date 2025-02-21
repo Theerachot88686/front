@@ -513,7 +513,7 @@ export default function AdminCurrentBookings() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-semibold text-gray-900">
-            การจองปัจจุบัน
+            สถานะการจอง
           </h1>
           <p className="text-gray-600 mt-2">จัดการการจองที่กำลังดำเนินการ</p>
         </div>

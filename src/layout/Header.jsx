@@ -12,7 +12,7 @@ const guestNav = [
 const userNav = [
   { to: "/", text: "หน้าหลัก" }, // เมนูสำหรับหน้าหลัก
   // { to: "/history", text: "ประวัติการจอง" }, // เมนูสำหรับประวัติการจอง
-  { to: "/current-bookings", text: "จองสนามปัจจุบัน" }, // เมนูสำหรับการจองสนาม
+  { to: "/current-bookings", text: "สถานะการจอง" }, // เมนูสำหรับการจองสนาม
   { to: "/booking-history", text: "ประวัติการจอง" },
   { to: "/user-reserve", text: "จองสนาม" },
 ];
