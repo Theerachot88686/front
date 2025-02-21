@@ -13,19 +13,16 @@ const userNav = [
   { to: "/", text: "หน้าหลัก" }, // เมนูสำหรับหน้าหลัก
   // { to: "/history", text: "ประวัติการจอง" }, // เมนูสำหรับประวัติการจอง
   { to: "/current-bookings", text: "จองสนามปัจจุบัน" }, // เมนูสำหรับการจองสนาม
-  { to: "/booking-history", text: "ประวัติการจอง" }, 
-  { to: "/user-reserve", text: "จองสนาม" }, 
+  { to: "/booking-history", text: "ประวัติการจอง" },
+  { to: "/user-reserve", text: "จองสนาม" },
 ];
-
-
 
 // กำหนดเมนูการนำทางสำหรับผู้ดูแลระบบ (admin)
 const adminNav = [
   { to: "/admin/manage", text: "การจัดการ" }, // เมนูสำหรับการจัดการ
-  // { to: "/admin/current-bookings", text: "จองสนาม" }, 
-  // { to: "/admin/history-bookings", text: "ประวัติการจอง" }, 
+  // { to: "/admin/current-bookings", text: "จองสนาม" },
+  // { to: "/admin/history-bookings", text: "ประวัติการจอง" },
 ];
-
 
 export default function Header() {
   // ใช้ useAuth hook เพื่อดึงข้อมูลผู้ใช้และฟังก์ชัน logout

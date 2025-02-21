@@ -20,6 +20,7 @@ export default function AdminHistoryBookings() {
           `${import.meta.env.VITE_API_URL}/booking/bookings/history`
         );
         setBookings(response.data);
+        console.log(response.data)
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -31,20 +32,32 @@ export default function AdminHistoryBookings() {
 
   const handleShowSlip = (booking) => {
     if (booking.Payment?.slip) {
-      const slipUrl = `${import.meta.env.VITE_API_URL}/${booking.Payment.slip}`;
+      const slipUrl = booking.Payment.slip; // ใช้ URL ของ ImgBB โดยตรง
+  
       Swal.fire({
-        title: "Payment Slip",
+        title: "สลิปการชำระเงิน",
         imageUrl: slipUrl,
         imageAlt: "Payment Slip",
-        confirmButtonText: "Close",
-        width: "80%",
-        padding: "3em",
+        confirmButtonText: "ปิด",
+        confirmButtonColor: "#333", // ปรับสีปุ่มให้ดูสวยขึ้น
+        width: "60%", // เพิ่มขนาดให้เหมาะสม
+        padding: "2em", // ปรับระยะห่างภายในให้สมดุล
+        background: "#f8f9fa", // ใช้พื้นหลังสีเทาอ่อน เพื่อให้ดูสะอาดตา
+        imageWidth: 400, // ปรับขนาดของรูปภาพให้ใหญ่ขึ้น
+        imageHeight: "auto", // ให้ภาพปรับขนาดอัตโนมัติ
+        showClass: {
+          popup: "animate__animated animate__fadeInDown", // เพิ่มแอนิเมชันตอนแสดง
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutUp", // เพิ่มแอนิเมชันตอนปิด
+        },
       });
+      
     } else {
       Swal.fire("No Slip", "ไม่พบสลิปการชำระเงิน", "info");
     }
   };
-
+  
   useEffect(() => {
     const currentDate = new Date();
     setMonth(currentDate.getMonth() + 1); // เดือนเริ่มจาก 0 (มกราคม = 0)

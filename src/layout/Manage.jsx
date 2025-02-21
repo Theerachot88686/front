@@ -58,7 +58,7 @@ export default function Manage() {
         const startLastMonth = new Date(currentYear, today.getMonth() - 1, 1);
         const endLastMonth = new Date(currentYear, today.getMonth(), 0);
 
-        const startTwoMonthsAgo = new Date(currentYear,today.getMonth() - 2,1);
+        const startTwoMonthsAgo = new Date(currentYear,today.getMonth() - 2, 1);
         const endTwoMonthsAgo = new Date(currentYear, today.getMonth() - 1, 0);
 
         // ฟังก์ชั่นเช็คว่า dueDate ตรงกับช่วงเวลา 3 เดือนหรือไม่
@@ -95,15 +95,16 @@ export default function Manage() {
         // แสดงข้อมูลการจองในแต่ละช่วงเวลา
         console.log("การจองในเดือนปัจจุบัน:", bookingCounts.currentMonth);
         console.log("การจองในเดือนที่แล้ว:", bookingCounts.lastMonth);
-        console.log("การจองในเดือนที่แล้ว 2 เดือน:",bookingCounts.twoMonthsAgo);
-
+        console.log( "การจองในเดือนที่แล้ว 2 เดือน:",bookingCounts.twoMonthsAgo);
+        console.log(bookingData.labels);
+        
         // ตั้งค่าข้อมูลที่ได้เพื่อใช้ในกราฟหรือ UI
         setBookingCounts(bookingCounts);
       } catch (error) {
         console.error("Error fetching booking data:", error);
       }
     };
-    
+
     const fetchBookingTimes = async () => {
       try {
         const response = await axios.get(
@@ -123,7 +124,7 @@ export default function Manage() {
           // เพิ่มจำนวนการจองในช่วงเวลานั้น
           timeSlotCounts[timeSlot] = (timeSlotCounts[timeSlot] || 0) + 1;
         });
-
+        console.log(timeSlotCounts);
         // เรียงข้อมูลตามจำนวนการจองจากมากไปหาน้อย และเลือก 5 อันดับแรก
         const top5TimeSlots = Object.entries(timeSlotCounts)
           .sort((a, b) => b[1] - a[1]) // เรียงข้อมูลตามจำนวนการจอง (จากมากไปหาน้อย)
@@ -166,6 +167,7 @@ export default function Manage() {
         );
         const bookings = response.data;
         const counts = {};
+        console.log(response.data);
 
         // นับจำนวนผู้ใช้งานตาม role
         bookings.forEach((booking) => {
@@ -191,6 +193,7 @@ export default function Manage() {
   // ข้อมูลสำหรับกราฟวงกลมจำนวนการจอง
   const bookingData = {
     labels: ["เดือนปัจจุบัน", "เดือนที่แล้ว", "2 เดือนที่แล้ว"],
+
     datasets: [
       {
         label: "จำนวนการในแต่ละเดือน",

@@ -23,14 +23,15 @@ export default function ManageUser() {
           `${import.meta.env.VITE_API_URL}/get/pull`
         );
         setUsers(response.data); // เก็บข้อมูลที่ได้จาก API
+       
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUsers();
+    
   }, []);
 
   // ฟังก์ชันสำหรับแก้ไขข้อมูลผู้ใช้

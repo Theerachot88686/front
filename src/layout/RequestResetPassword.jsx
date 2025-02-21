@@ -42,7 +42,7 @@ export default function RequestResetPassword() {
           content: "text-gray-800", // สีของข้อความ (เทาเข้ม)
           confirmButton: "bg-red-500 text-white hover:bg-red-600", // ปุ่มสีแดง
         },
-      });
+      }); console.log(message);
     }
   };
 

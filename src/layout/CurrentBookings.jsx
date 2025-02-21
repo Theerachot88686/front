@@ -18,6 +18,7 @@ function CurrentBookings() {
         ]);
         
         setBookings(bookingsRes.data);
+        console.log(bookingsRes.data);
         setFields(fieldsRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -26,17 +27,14 @@ function CurrentBookings() {
     fetchData();
   }, [user.id]);
 
-  const formatDateTime = (dateTime) => {
-    return dayjs(dateTime).format("DD/MM/YYYY HH:mm");
-  };
-
   const calculateTotalPrice = (booking) => {
     const field = fields.find(f => f.id === booking.fieldId);
     if (!field) return 0;
     
     const duration = dayjs(booking.endTime).diff(booking.startTime, 'hour');
+    console.log(field);
     return (field.pricePerHour * duration).toFixed(2);
-  };
+  }; 
 
   const handleCancel = async (bookingId) => {
     try {

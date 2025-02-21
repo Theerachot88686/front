@@ -42,59 +42,6 @@ export default function UserReserve() {
     "22:00",
   ];
 
-  // แก้ไข State
-  const [selectedSlots, setSelectedSlots] = useState([]);
-  const [selectionStart, setSelectionStart] = useState(null);
-
-  // ฟังก์ชันจัดการการเลือกเวลาใหม่
-  const handleSlotInteraction = (slot, isShiftKey) => {
-    if (bookedTimes.some((t) => slot >= t.startTime && slot < t.endTime))
-      return;
-
-    let newSlots = [...selectedSlots];
-
-    if (isShiftKey && selectionStart) {
-      const startIdx = timeSlots.indexOf(selectionStart);
-      const endIdx = timeSlots.indexOf(slot);
-      const [start, end] = [
-        Math.min(startIdx, endIdx),
-        Math.max(startIdx, endIdx),
-      ];
-      newSlots = Array.from(
-        new Set([...newSlots, ...timeSlots.slice(start, end + 1)])
-      );
-    } else {
-      if (newSlots.includes(slot)) {
-        newSlots = newSlots.filter((s) => s !== slot);
-      } else {
-        newSlots.push(slot);
-      }
-      setSelectionStart(slot);
-    }
-
-    setSelectedSlots(newSlots);
-    updateBookingTimes(newSlots);
-  };
-
-  // ฟังก์ชันอัปเดตเวลาจอง
-  const updateBookingTimes = (slots) => {
-    if (slots.length === 0) {
-      setInput((prev) => ({ ...prev, startTime: "", endTime: "" }));
-      return;
-    }
-
-    const sorted = [...slots].sort();
-    const start = sorted[0];
-    const end = timeSlots[timeSlots.indexOf(sorted[sorted.length - 1]) + 1];
-
-    setInput((prev) => ({
-      ...prev,
-      startTime: start,
-      endTime:
-        end || `${parseInt(sorted[sorted.length - 1].split(":")[0]) + 1}:00`,
-    }));
-  };
-
   const hdlChange = (e) => {
     const { name, value } = e.target;
 
@@ -363,7 +310,6 @@ export default function UserReserve() {
     fetchBookings(dayjs(calendarDate).format("YYYY-MM-DD"));
   }, [calendarDate]);
 
-  // ฟังก์ชันสำหรับเลือกเวลาในตาราง
   // แก้ไขฟังก์ชันจัดการการเลือกเวลา
   const handleSelectTime = (slot) => {
     const isBooked = bookedTimes.some(
@@ -454,9 +400,17 @@ export default function UserReserve() {
             <div
               key={slot}
               className={`flex-1 text-center p-3 cursor-pointer transition-all duration-300 ease-in-out rounded-lg shadow-md mx-1
-                ${isBooked ? "bg-red-500 text-white line-through cursor-not-allowed" : ""}
+                ${
+                  isBooked
+                    ? "bg-red-500 text-white line-through cursor-not-allowed"
+                    : ""
+                }
                 ${isInRange ? "bg-blue-600 text-white shadow-lg scale-105" : ""}
-                ${!isBooked && !isInRange ? "bg-green-400 text-black hover:bg-green-500 active:scale-95" : ""}
+                ${
+                  !isBooked && !isInRange
+                    ? "bg-green-400 text-black hover:bg-green-500 active:scale-95"
+                    : ""
+                }
                 ${isFirst ? "rounded-l-full" : ""}
                 ${isLast ? "rounded-r-full" : ""}
               `}
@@ -492,18 +446,21 @@ export default function UserReserve() {
             <div className="mb-4">
               <label className="block text-gray-700">ช่วงเวลาที่เลือก</label>
               <div className="mt-2 p-3 bg-gray-50 rounded-md">
-  {input.startTime && input.endTime ? (
-    <div className="flex items-center text-green-600">
-      <span className="mr-2">🕒</span>
-      {`${input.startTime} - ${input.endTime}`}
-      <span className="ml-2 text-gray-500">
-        (ทั้งหมด {parseInt(input.endTime.split(":")[0]) - parseInt(input.startTime.split(":")[0])} ชั่วโมง)
-      </span>
-    </div>
-  ) : (
-    <div className="text-gray-500">ยังไม่ได้เลือกเวลา</div>
-  )}
-</div>
+                {input.startTime && input.endTime ? (
+                  <div className="flex items-center text-green-600">
+                    <span className="mr-2">🕒</span>
+                    {`${input.startTime} - ${input.endTime}`}
+                    <span className="ml-2 text-gray-500">
+                      (ทั้งหมด{" "}
+                      {parseInt(input.endTime.split(":")[0]) -
+                        parseInt(input.startTime.split(":")[0])}{" "}
+                      ชั่วโมง)
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-gray-500">ยังไม่ได้เลือกเวลา</div>
+                )}
+              </div>
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">เลือกสนาม</label>
@@ -534,7 +491,11 @@ export default function UserReserve() {
               {calculateTotalCost() || 0} บาท
             </p>
           </div>
-          <button type="submit" className="btn btn-success w-full" disabled={!input.startTime || !input.endTime}>
+          <button
+            type="submit"
+            className="btn btn-success w-full"
+            disabled={!input.startTime || !input.endTime}
+          >
             ยืนยัน
           </button>
         </form>
@@ -566,7 +527,9 @@ export default function UserReserve() {
               การจองในวันที่ {dayjs(calendarDate).format("DD/MM/YYYY")}
             </h3>
             <div>
-              <h4 className="text-lg font-medium">เวลาที่ว่าง: ช่องละ 1 ชั่วโมง</h4>
+              <h4 className="text-lg font-medium">
+                เวลาที่ว่าง: ช่องละ 1 ชั่วโมง
+              </h4>
               <div className="mt-2">{renderTimeSlots()}</div>
             </div>
           </div>

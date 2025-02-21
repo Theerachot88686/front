@@ -21,10 +21,12 @@ export default function Field() {
           `${import.meta.env.VITE_API_URL}/field`
         );
         setFields(response.data); // เก็บข้อมูลฟิลด์ที่ดึงมา
+        console.log(response.data)
       } catch (error) {
         console.error("Error fetching fields:", error);
       } finally {
         setLoading(false); // เสร็จสิ้นการโหลด
+        
       }
     };
 

@@ -13,9 +13,12 @@ export default function LoginForm() {
   });
 
   const hdlChange = (e) => {
-    setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setInput((prev) => {
+      console.log(prev);
+      return { ...prev, [e.target.name]: e.target.value };
+    });
   };
-
+  
   const hdlSubmit = async (e) => {
     try {
       e.preventDefault();

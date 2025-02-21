@@ -16,6 +16,7 @@ import CurrentBookings from "../layout/CurrentBookings";
 import HistoryBookings from "../layout/HistoryBookings";
 import AdminCurrentBookings from "../layout/AdminCurrentBookings";
 import AdminHistoryBookings from "../layout/AdminHistoryBookings";
+
 // Routes สำหรับผู้ใช้ที่ยังไม่ได้เข้าสู่ระบบ
 const guestRoutes = (
   <>
@@ -59,11 +60,7 @@ const AppRouter = () => {
         <Route path="/user-reserve" element={<UserReserve />} />
         <Route path="/" element={<UserHome />} /> (default)
         {/* ตรวจสอบสิทธิ์ของผู้ใช้และแสดงเส้นทางที่เหมาะสม */}
-        {user?.role === "admin"
-          ? adminRoutes
-          : user?.id
-          ? userRoutes
-          : guestRoutes}
+        {user?.role === "admin"? adminRoutes: user?.id? userRoutes: guestRoutes}
       </Routes>
     </BrowserRouter>
   );

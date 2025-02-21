@@ -44,7 +44,6 @@ export default function AdminCurrentBookings() {
     "20:00",
     "21:00",
     "22:00",
-    "23:00",
   ];
 
   // เพิ่ม State สำหรับติดตามการเลือก
@@ -60,11 +59,7 @@ export default function AdminCurrentBookings() {
 
     if (!formData.startTime) {
       // เริ่มเลือกเวลาใหม่
-      setFormData((prev) => ({
-        ...prev,
-        startTime: slot,
-        endTime: "",
-      }));
+      setFormData((prev) => ({...prev,startTime: slot, endTime: "",}));
       setSelectionStart(slot);
     } else {
       // จบการเลือกช่วงเวลา
@@ -180,41 +175,6 @@ export default function AdminCurrentBookings() {
     return hours * selectedFieldPrice;
   };
 
-  // ฟังก์ชันตรวจสอบการจองซ้ำ
-  const checkDuplicateBooking = async (output) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/booking/bookings/${
-          user.id
-        }/id?dueDate=${output.dueDate}&fieldId=${output.fieldId}`
-      );
-      const bookings = response.data;
-
-      return bookings.some((booking) => {
-        const existingStartTime = dayjs(booking.startTime);
-        const existingEndTime = dayjs(booking.endTime);
-        const inputStartTime = dayjs(output.startTime);
-        const inputEndTime = dayjs(output.endTime);
-
-        return (
-          booking.fieldId === output.fieldId &&
-          ((inputStartTime.isAfter(existingStartTime) &&
-            inputStartTime.isBefore(existingEndTime)) ||
-            (inputEndTime.isAfter(existingStartTime) &&
-              inputEndTime.isBefore(existingEndTime)) ||
-            (inputStartTime.isSame(existingStartTime) &&
-              inputEndTime.isSame(existingEndTime)))
-        );
-      });
-    } catch (error) {
-      console.error("Error checking duplicate booking:", error);
-      return false;
-    }
-  };
-
-  // ฟังก์ชันเปิดฟอร์มการเพิ่มการจอง
-
-
   // ฟังก์ชันแก้ไขการจอง
   const handleEditBookingSubmit = async (e) => {
     e.preventDefault();
@@ -284,41 +244,6 @@ export default function AdminCurrentBookings() {
     setSelectedFieldPrice(0);
   };
 
-  // ฟังก์ชันลบการจอง
-  const handleDeleteClick = async (booking) => {
-    Swal.fire({
-      title: `แน่ใจว่าต้องการลบ ${booking.field.name}?`,
-      text: "This action cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axios.delete(
-            `${import.meta.env.VITE_API_URL}/booking/bookings/${booking.id}`
-          );
-          setBookings((prevBookings) =>
-            prevBookings.filter((b) => b.id !== booking.id)
-          );
-          Swal.fire(
-            "Deleted!",
-            `Booking for ${booking.field.name} has been deleted.`,
-            "success"
-          );
-        } catch (error) {
-          console.error("Error deleting booking:", error);
-          Swal.fire(
-            "Error!",
-            "There was an error while deleting the booking.",
-            "error"
-          );
-        }
-      }
-    });
-  };
 
   // ฟังก์ชันตั้งค่าแก้ไขการจอง
   const handleEditClick = (booking) => {
@@ -338,30 +263,42 @@ export default function AdminCurrentBookings() {
   // ฟังก์ชันสำหรับแสดง popup สลิปการชำระเงิน
   const handleShowSlip = (booking) => {
     if (booking.Payment && booking.Payment.slip) {
-      // สมมุติว่า slip ที่ได้เก็บเป็น path ที่สัมพันธ์กับ backend
-      const slipUrl = `${import.meta.env.VITE_API_URL}/${booking.Payment.slip}`;
-      if (slipUrl) {
-        Swal.fire({
-          title: "Payment Slip",
-          imageUrl: slipUrl,
-          imageAlt: "Payment Slip",
-          confirmButtonText: "Close",
-          width: "80%", // ขนาดหน้าต่างของ Swal
-          padding: "3em", // ระยะห่างภายในกล่อง
-        });
-      } else {
-        Swal.fire({
-          title: "No Slip",
-          text: "This booking does not have a payment slip.",
-          icon: "info",
-          confirmButtonColor: "#111", // สีปุ่ม "Close"
-          confirmButtonText: "Close",
-        });
-      }
+      // ใช้ URL ของ ImgBB โดยตรง
+      const slipUrl = booking.Payment.slip;
+  
+      Swal.fire({
+        title: "สลิปการชำระเงิน",
+        imageUrl: slipUrl,
+        imageAlt: "Payment Slip",
+        confirmButtonText: "ปิด",
+        confirmButtonColor: "#333", // ปรับสีปุ่มให้ดูสวยขึ้น
+        width: "60%", // เพิ่มขนาดให้เหมาะสม
+        padding: "2em", // ปรับระยะห่างภายในให้สมดุล
+        background: "#f8f9fa", // ใช้พื้นหลังสีเทาอ่อน เพื่อให้ดูสะอาดตา
+        imageWidth: 400, // ปรับขนาดของรูปภาพให้ใหญ่ขึ้น
+        imageHeight: "auto", // ให้ภาพปรับขนาดอัตโนมัติ
+        showClass: {
+          popup: "animate__animated animate__fadeInDown", // เพิ่มแอนิเมชันตอนแสดง
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutUp", // เพิ่มแอนิเมชันตอนปิด
+        },
+      });
+      
+    } else {
+      Swal.fire({
+        title: "ไม่มีหลักฐานการชำระเงิน",
+        text: "การจองนี้ยังไม่มีสลิปการชำระเงิน กรุณาตรวจสอบอีกครั้ง",
+        icon: "info",
+        confirmButtonColor: "#333", // ปรับเป็นสีเข้ม (ดูดีขึ้น)
+        confirmButtonText: "ปิด",
+        iconColor: "#007bff", // เปลี่ยนไอคอนเป็นสีฟ้า
+        background: "#f0f8ff", // เพิ่มพื้นหลังฟ้าอ่อนเพื่อให้อ่านง่าย
+      });
+      
     }
   };
-
-  // === ฟังก์ชันใหม่สำหรับอัปเดตสถานะการจองและการชำระเงิน ===
+  
 
   const handleCancelBooking = async (booking) => {
     try {
@@ -373,14 +310,16 @@ export default function AdminCurrentBookings() {
         confirmButtonText: "ใช่, ยกเลิก",
         cancelButtonText: "ไม่ใช่",
         confirmButtonColor: "#dc3545", // สีแดงสำหรับปุ่มยืนยันการยกเลิก
-        cancelButtonColor: "#6c757d",  // สีเทาอ่อนสำหรับปุ่มยกเลิก
-        background: "#fff3cd",  // พื้นหลังสีเหลืองอ่อนเพื่อให้ดูเด่น
-        iconColor: "#dc3545",  // สีไอคอนเป็นสีแดง
+        cancelButtonColor: "#6c757d", // สีเทาอ่อนสำหรับปุ่มยกเลิก
+        background: "#fff3cd", // พื้นหลังสีเหลืองอ่อนเพื่อให้ดูเด่น
+        iconColor: "#dc3545", // สีไอคอนเป็นสีแดง
       });
-  
+
       if (result.isConfirmed) {
         const response = await axios.put(
-          `${import.meta.env.VITE_API_URL}/booking/bookings/${booking.id}/cancel`
+          `${import.meta.env.VITE_API_URL}/booking/bookings/${
+            booking.id
+          }/cancel`
         );
         if (response.status === 200) {
           setBookings((prev) =>
@@ -392,7 +331,7 @@ export default function AdminCurrentBookings() {
             icon: "success",
             confirmButtonText: "ตกลง",
             confirmButtonColor: "#28a745", // สีเขียวสำหรับปุ่มยืนยัน
-            iconColor: "#28a745",  // สีไอคอนเป็นสีเขียว
+            iconColor: "#28a745", // สีไอคอนเป็นสีเขียว
           });
         }
       }
@@ -407,7 +346,6 @@ export default function AdminCurrentBookings() {
       });
     }
   };
-  
 
   const handleConfirmBooking = async (booking) => {
     try {
@@ -419,9 +357,9 @@ export default function AdminCurrentBookings() {
         confirmButtonText: "ใช่, ยืนยัน",
         cancelButtonText: "ไม่ใช่",
         confirmButtonColor: "#28a745", // ปรับสีปุ่มยืนยันเป็นสีเขียว
-        cancelButtonColor: "#dc3545",  // ปรับสีปุ่มยกเลิกเป็นสีแดง
+        cancelButtonColor: "#dc3545", // ปรับสีปุ่มยกเลิกเป็นสีแดง
       });
-      
+
       if (result.isConfirmed) {
         const response = await axios.put(
           `${import.meta.env.VITE_API_URL}/booking/bookings/${
@@ -441,7 +379,6 @@ export default function AdminCurrentBookings() {
             background: "#f4fdf4", // พื้นหลังสีอ่อนเพื่อให้ดูสบายตา
             iconColor: "#28a745", // สีของไอคอน (เขียว)
           });
-          
         }
       }
     } catch (error) {
@@ -474,7 +411,23 @@ export default function AdminCurrentBookings() {
           setBookings((prev) =>
             prev.map((b) => (b.id === booking.id ? response.data : b))
           );
-          Swal.fire("การจองสำเร็จ", "", "success");
+          Swal.fire({
+            title: "🎉 การจองสำเร็จ!",
+            text: "ระบบได้บันทึกการจองของคุณเรียบร้อยแล้ว",
+            icon: "success",
+            confirmButtonText: "ตกลง",
+            confirmButtonColor: "#28a745", // ปรับปุ่มให้เป็นสีเขียว
+            iconColor: "#28a745", // ปรับสีไอคอนเป็นสีเขียว
+            background: "#d4edda", // ใช้พื้นหลังสีเขียวอ่อนให้อ่านง่าย
+            timer: 3000, // ให้ Swal ปิดเองหลังจาก 3 วินาที
+            showClass: {
+              popup: "animate__animated animate__zoomIn", // แอนิเมชันตอนแสดงผล
+            },
+            hideClass: {
+              popup: "animate__animated animate__zoomOut", // แอนิเมชันตอนปิด
+            },
+          });
+          
         }
       }
     } catch (error) {
@@ -489,7 +442,7 @@ export default function AdminCurrentBookings() {
 
   // ฟังก์ชันสำหรับแสดงเวลาที่ว่าง
   const renderTimeSlots = () => {
-    const slotsPerRow = 4;
+    const slotsPerRow = 5;
     const rows = [];
 
     // แปลงเวลาเริ่มต้นและสิ้นสุดเป็น index
@@ -565,8 +518,6 @@ export default function AdminCurrentBookings() {
           <p className="text-gray-600 mt-2">จัดการการจองที่กำลังดำเนินการ</p>
         </div>
 
-
-
         {/* ตารางการจอง */}
         {loading ? (
           <div className="flex justify-center mt-6">
@@ -624,7 +575,7 @@ export default function AdminCurrentBookings() {
                       <td>{totalCost.toFixed(2)} บาท</td>
                       <td>{booking.status}</td>
                       <td>
-                      <button
+                        <button
                           className="btn btn-info btn-sm mr-2"
                           onClick={() => handleShowSlip(booking)}
                         >
@@ -776,15 +727,22 @@ export default function AdminCurrentBookings() {
                     </h3>
                     <Calendar
                       onChange={(date) => {
-                        setCalendarDate(date);
-                        setFormData((prev) => ({
+                        const formattedDate = dayjs(date).format("YYYY-MM-DD");
+                        setCalendarDate(formattedDate); // ✅ กำหนดวันที่ที่เลือกในปฏิทิน
+                        setInput((prev) => ({
                           ...prev,
-                          dueDate: dayjs(date).format("YYYY-MM-DD"),
-                        }));
-                        fetchBookingsByDate(dayjs(date).format("YYYY-MM-DD"));
+                          dueDate: formattedDate,
+                        })); // ✅ อัปเดตใน input date
+                        fetchBookings(formattedDate); // ✅ โหลดการจองของวันนั้น
                       }}
                       value={calendarDate}
-                      className="mb-6"
+                      className="mb-6 p-4 rounded-lg shadow-lg bg-white border border-gray-300"
+                      tileClassName={({ date, view }) => {
+                        if (dayjs(date).isSame(calendarDate, "day")) {
+                          return "bg-blue-500 text-white"; // ✅ เน้นวันที่เลือกด้วยสีฟ้า
+                        }
+                        return "";
+                      }}
                     />
                     <div>
                       <h4 className="text-md font-medium mb-2">
