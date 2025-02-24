@@ -16,6 +16,7 @@ import CurrentBookings from "../layout/CurrentBookings";
 import HistoryBookings from "../layout/HistoryBookings";
 import AdminCurrentBookings from "../layout/AdminCurrentBookings";
 import AdminHistoryBookings from "../layout/AdminHistoryBookings";
+import EditCompetitionForm from "../layout/EditCompetitionForm";
 
 // Routes สำหรับผู้ใช้ที่ยังไม่ได้เข้าสู่ระบบ
 const guestRoutes = (
@@ -46,6 +47,7 @@ const adminRoutes = (
     <Route path="/admin/manage/field" element={<Field />} />
     <Route path="/admin/current-bookings" element={<AdminCurrentBookings />} />
     <Route path="/admin/history-bookings" element={<AdminHistoryBookings />} />
+    <Route path="/admin/edit" element={<EditCompetitionForm />} />
   </>
 );
 

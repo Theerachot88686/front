@@ -262,6 +262,11 @@ export default function Manage() {
     navigate("/admin/manage/field");
   };
 
+  const goToedit = () => {
+    navigate("/admin/edit");
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
@@ -330,6 +335,18 @@ export default function Manage() {
               <div className="card-actions">
                 <button className="btn btn-accent" onClick={goToReports}>
                   Go to Field
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="card w-full bg-white shadow-xl">
+            <figure className="px-10 pt-10"></figure>
+            <div className="card-body items-center text-center">
+              <h2 className="card-title">จักการข้อมูลหน้าแรก</h2>
+              <p>จัดการแก้ไขข้อมูลหน้าแรก</p>
+              <div className="card-actions">
+                <button className="btn btn-accent" onClick={goToedit}>
+                  GO to settings
                 </button>
               </div>
             </div>
