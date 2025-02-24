@@ -263,7 +263,7 @@ export default function AdminCurrentBookings() {
   // ฟังก์ชันสำหรับแสดง popup สลิปการชำระเงิน
   const handleShowSlip = (booking) => {
     if (booking.Payment && booking.Payment.slip) {
-      // ใช้ URL ของ ImgBB โดยตรง
+      // ใช้ URL ของสลิปจากระบบของคุณเอง
       const slipUrl = booking.Payment.slip;
   
       Swal.fire({

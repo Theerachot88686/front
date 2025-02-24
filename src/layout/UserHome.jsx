@@ -1,6 +1,7 @@
 import React from "react";
 
 function UserHome() {
+  
   return (
     <div>
       <div className="carousel w-full">

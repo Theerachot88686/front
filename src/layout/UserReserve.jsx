@@ -195,6 +195,7 @@ export default function UserReserve() {
       title: "กรุณาชำระเงินและแนบสลิป",
       html: `
         <p>กรุณาสแกน QR Code เพื่อชำระเงินก่อนดำเนินการต่อ</p>
+        <p>เมื่อกดชำระเงินแล้ว รอระบบตรวจสอบสลิปจนกว่าจะมีแจ้งเตือน</p>
         <div style="display: flex; justify-content: center;">
           <img src="${qrCodeUrl}" alt="QR Code" style="width:200px; height:200px;"/>
         </div>
@@ -227,35 +228,31 @@ export default function UserReserve() {
         const slipFile = result.value;
 
         const formData = new FormData();
-        formData.append(
-          "startTime",
-          dayjs(`${input.dueDate}T${input.startTime}`).toISOString()
-        );
-        formData.append(
-          "endTime",
-          dayjs(`${input.dueDate}T${input.endTime}`).toISOString()
-        );
-        formData.append(
-          "dueDate",
-          dayjs(`${input.dueDate}T${input.startTime}`).toISOString()
-        );
+        formData.append("startTime", dayjs(`${input.dueDate}T${input.startTime}`).toISOString());
+        formData.append("endTime", dayjs(`${input.dueDate}T${input.endTime}`).toISOString());
+        formData.append("dueDate", dayjs(`${input.dueDate}T${input.startTime}`).toISOString());
         formData.append("totalCost", calculateTotalCost());
         formData.append("fieldId", parseInt(input.selectedField));
         formData.append("slip", slipFile);
+        
+        console.log("📤 FormData ที่ส่งไป:", Object.fromEntries(formData.entries()));
+        
 
         try {
           const rs = await axios.post(
-            `${import.meta.env.VITE_API_URL}/booking/bookings/create/${
-              user.id
-            }`,
+            `${import.meta.env.VITE_API_URL}/booking/bookings/create/${user.id}`,
             formData,
-            { headers: { "Content-Type": "multipart/form-data" } }
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
           );
 
           if (rs.status === 200) {
             Swal.fire({
-              title: "Success",
-              text: "ชำระเงินเรียบร้อย กรุณาบันทึกหน้าจอเพื่อให้พนักงานตรวจสอบ",
+              title: "✅ ชำระเงินสำเร็จ",
+              text: "กรุณาบันทึกหน้าจอเพื่อให้พนักงานตรวจสอบ",
               icon: "success",
               confirmButtonText: "ตกลง",
               customClass: {
@@ -273,8 +270,8 @@ export default function UserReserve() {
           }
         } catch (err) {
           Swal.fire({
-            title: "Error",
-            text: "เกิดข้อผิดพลาดในการบันทึกการจอง",
+            title: "❌ เกิดข้อผิดพลาด",
+            text: err.response?.data?.error || "เกิดข้อผิดพลาดในการตรวจสอบสลิป",
             icon: "error",
             confirmButtonText: "ตกลง",
             customClass: {
@@ -283,6 +280,7 @@ export default function UserReserve() {
               confirmButton: "bg-red-500 text-white hover:bg-red-600",
             },
           });
+          console.error("API Error:", err); // เพิ่ม log เพื่อตรวจสอบ error
         }
       } else {
         console.log("User cancelled the payment process.");
